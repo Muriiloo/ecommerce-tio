@@ -22,7 +22,7 @@ model Product {
   id            String         @id @default(uuid())
   name          String
   description   String
-  price         Decimal
+  price         Decimal        @db.Decimal(10, 2)
   stockQuantity Int
   imageUrl      String
   createdAt     DateTime       @default(now())
