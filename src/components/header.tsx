@@ -20,6 +20,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "./ui/menubar";
+import Image from "next/image";
 
 const Header = () => {
   return (
@@ -28,9 +29,12 @@ const Header = () => {
         <div className="flex justify-between items-center h-16 lg:h-20">
           <div className="flex-shrink-0">
             <Link href="/" className="group">
-              <h1 className="text-white text-2xl lg:text-3xl font-bold tracking-tight hover:text-gray-300 transition-colors duration-300">
-                UziVolti
-              </h1>
+              <Image
+                src="/logo_sem_fundo.png"
+                alt="logo"
+                width={100}
+                height={40}
+              />
             </Link>
           </div>
 

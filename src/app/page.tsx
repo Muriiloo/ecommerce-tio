@@ -1,5 +1,7 @@
-import Header from "@/components/header";
-import { Button } from "@/components/ui/button";
+import { transformProducts } from "@/lib/transformedProducts";
+import Footer from "@/components/footer";
+import ProductCard from "@/components/productCard";
+
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
@@ -8,9 +10,8 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import WhatsappButton from "@/components/whatsappButton";
 import { db } from "@/lib/prisma";
-import { ShoppingCart } from "lucide-react";
+
 import Image from "next/image";
 
 const Home = async () => {
@@ -33,12 +34,10 @@ const Home = async () => {
   ];
 
   const products = await db.product.findMany({});
+  const transformedProducts = transformProducts(products);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <WhatsappButton />
-      <Header />
-
       <section className="relative">
         <Carousel className="w-full h-[500px] md:h-[600px]">
           <CarouselContent>
@@ -86,52 +85,14 @@ const Home = async () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((item) => (
-            <Card
-              key={item.id}
-              className="group hover:shadow-lg transition-shadow duration-300"
-            >
-              <CardContent className="p-0">
-                <div className="relative h-64 bg-gray-200 rounded-t-lg overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                    <span className="text-gray-600 font-medium">Produto</span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                    <ShoppingCart />
-                  </div>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-green-600">
-                      R$ {item.price.toFixed(2)}
-                    </span>
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                      Ver Detalhes
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        <div>
+          <ProductCard product={transformedProducts} />
         </div>
       </section>
 
-      <section className="bg-black text-white py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Pronto para fazer seu pedido?
-          </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Entre em contato conosco pelo WhatsApp e tire todas suas dúvidas
-          </p>
-          <Button className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">
-            Falar no WhatsApp
-          </Button>
-        </div>
-      </section>
+      <div>
+        <Footer />
+      </div>
     </div>
   );
 };
