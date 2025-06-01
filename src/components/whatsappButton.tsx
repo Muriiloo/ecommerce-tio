@@ -20,8 +20,7 @@ const WhatsappButton = () => {
         </svg>
       </div>
 
-      {/* Texto: completamente invisível até o hover */}
-      <span className="w-0 opacity-0 px-0 group-hover:w-auto group-hover:opacity-100 group-hover:px-3 overflow-hidden whitespace-nowrap transition-all duration-200 text-base font-medium">
+      <span className="w-0 opacity-0 px-2 group-hover:w-auto group-hover:opacity-100 group-hover:px-3 overflow-hidden whitespace-nowrap transition-all duration-200 text-base font-medium">
         Fale conosco!
       </span>
     </Link>

@@ -9,7 +9,6 @@ import {
   ShoppingBasket,
   ShoppingCart,
   User,
-  UserRoundPen,
 } from "lucide-react";
 
 import DropdownHeader from "./dropdownHeader";
@@ -67,9 +66,7 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-4">
-            <DropdownHeader
-              icone={<UserRoundPen size={24} className="text-white" />}
-            />
+            <DropdownHeader icone={<User size={24} className="text-white" />} />
             <ShoppingCart size={24} className="text-white " />
           </div>
 
