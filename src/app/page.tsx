@@ -1,5 +1,11 @@
+import WhatsappButton from "@/components/whatsappButton";
+
 const Home = () => {
-  return <div>Teste</div>;
+  return (
+    <div>
+      <WhatsappButton />
+    </div>
+  );
 };
 
 export default Home;
