@@ -36,20 +36,28 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               {
                 href: "/admin/dashboard",
                 label: "Dashboard",
-                color: "blue-400",
+                color: "bg-blue-400",
               },
               {
                 href: "/admin/produtos",
                 label: "Produtos",
-                color: "green-400",
+                color: "bg-green-400",
               },
-              { href: "/admin/pedidos", label: "Pedidos", color: "orange-400" },
+              { 
+                href: "/admin/pedidos", 
+                label: "Pedidos", 
+                color: "bg-orange-400" 
+              },
               {
                 href: "/admin/usuarios",
                 label: "Usuários",
-                color: "purple-400",
+                color: "bg-purple-400",
               },
-              { href: "/", label: "Voltar ao site", color: "red-400" },
+              { 
+                href: "/", 
+                label: "Voltar ao site", 
+                color: "bg-red-400" 
+              },
             ].map(({ href, label, color }) => (
               <Link
                 key={label}
@@ -57,7 +65,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 className="flex items-center px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700/50 transition-all duration-200 font-medium group"
               >
                 <span
-                  className={`w-2 h-2 bg-${color} rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
+                  className={`w-2 h-2 ${color} rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200`}
                 />
                 {label}
               </Link>

@@ -1,5 +1,7 @@
 "use client";
 
+import MiniCart from "./miniCart";
+
 import Link from "next/link";
 import {
   House,
@@ -7,7 +9,6 @@ import {
   MessageCircle,
   Phone,
   ShoppingBasket,
-  ShoppingCart,
   User,
 } from "lucide-react";
 
@@ -71,7 +72,7 @@ const Header = () => {
 
           <div className="hidden md:flex items-center gap-4">
             <DropdownHeader icone={<User size={24} className="text-white" />} />
-            <ShoppingCart size={24} className="text-white " />
+            <MiniCart />
           </div>
 
           {/* Menu Mobile */}
