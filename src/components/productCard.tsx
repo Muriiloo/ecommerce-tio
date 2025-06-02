@@ -4,6 +4,7 @@ import { ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { useCart } from "@/context/cartContext";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: {
@@ -16,6 +17,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const router = useRouter();
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -34,9 +36,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
                 <button
-                  onClick={() =>
-                    addToCart({ ...item, quantity: 1 })
-                  }
+                  onClick={() => addToCart({ ...item, quantity: 1 })}
                 >
                   <ShoppingCart className="hover:text-blue-600 transition" />
                 </button>
@@ -46,7 +46,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 <span className="text-2xl font-bold text-green-600">
                   R$ {item.price.toFixed(2)}
                 </span>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <Button
+                  onClick={() => router.push(`/productPage/${item.id}`)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
                   Ver Detalhes
                 </Button>
               </div>
