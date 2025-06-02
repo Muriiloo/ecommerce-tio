@@ -1,6 +1,9 @@
+"use client";
+
 import { ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
+import { useCart } from "@/context/cartContext";
 
 interface ProductCardProps {
   product: {
@@ -12,6 +15,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { addToCart } = useCart();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {product.map((item) => (
@@ -28,7 +33,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <div className="p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                <ShoppingCart />
+                <button
+                  onClick={() =>
+                    addToCart({ ...item, quantity: 1 })
+                  }
+                >
+                  <ShoppingCart className="hover:text-blue-600 transition" />
+                </button>
               </div>
               <p className="text-gray-600 mb-4">{item.description}</p>
               <div className="flex items-center justify-between">

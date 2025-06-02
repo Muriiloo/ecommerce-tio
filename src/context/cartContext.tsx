@@ -17,12 +17,16 @@ type CartContextType = {
   increaseQty: (id: string) => void;
   decreaseQty: (id: string) => void;
   clearCart: () => void;
+  isMiniCartOpen: boolean;
+  openMiniCart: () => void;
+  closeMiniCart: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isMiniCartOpen, setMiniCartOpen] = useState(false);
 
   const addToCart = (item: CartItem) => {
     setCart(prev =>
@@ -54,9 +58,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => setCart([]);
 
+  const openMiniCart = () => setMiniCartOpen(true);
+  const closeMiniCart = () => setMiniCartOpen(false);
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, increaseQty, decreaseQty, clearCart }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        increaseQty,
+        decreaseQty,
+        clearCart,
+        isMiniCartOpen,
+        openMiniCart,
+        closeMiniCart,
+      }}
     >
       {children}
     </CartContext.Provider>
