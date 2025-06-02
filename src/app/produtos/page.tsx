@@ -1,5 +1,4 @@
 import { transformProducts } from "@/lib/transformedProducts";
-import Footer from "@/components/footer";
 import ProductCard from "@/components/productCard";
 import { db } from "@/lib/prisma";
 
@@ -23,8 +22,6 @@ const ProdutosPage = async () => {
           <ProductCard product={transformedProducts} />
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

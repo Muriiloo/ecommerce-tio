@@ -1,5 +1,4 @@
 import { transformProducts } from "@/lib/transformedProducts";
-import Footer from "@/components/footer";
 import ProductCard from "@/components/productCard";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -89,10 +88,6 @@ const Home = async () => {
           <ProductCard product={transformedProducts} />
         </div>
       </section>
-
-      <div>
-        <Footer />
-      </div>
     </div>
   );
 };

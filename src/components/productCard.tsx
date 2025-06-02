@@ -20,7 +20,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           className="group hover:shadow-lg transition-shadow duration-300"
         >
           <CardContent className="p-0">
-            <div className="relative h-64 bg-gray-200 rounded-t-lg overflow-hidden">
+            <div className="relative h-64 bg-gray-200 overflow-hidden rounded-t-xl">
               <div className="absolute inset-0 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
                 <span className="text-gray-600 font-medium">Produto</span>
               </div>
