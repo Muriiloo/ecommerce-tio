@@ -27,7 +27,8 @@ async function main() {
       description: "Camiseta com tecido tecnológico",
       price: 79.9,
       stockQuantity: 20,
-      imageUrl: "https://via.placeholder.com/300",
+      imageUrl:
+        "https://images.unsplash.com/photo-1618354691323-b104d46f3ae3?auto=format&fit=crop&w=600&q=80",
     },
   });
 
@@ -37,7 +38,8 @@ async function main() {
       description: "Boné leve e confortável",
       price: 39.9,
       stockQuantity: 15,
-      imageUrl: "https://via.placeholder.com/300",
+      imageUrl:
+        "https://images.unsplash.com/photo-1593032465171-8b32e1bb10f2?auto=format&fit=crop&w=600&q=80",
     },
   });
 

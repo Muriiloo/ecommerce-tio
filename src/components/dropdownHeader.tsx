@@ -1,4 +1,6 @@
-import { ShoppingCart, UserRoundPen, X } from "lucide-react";
+"use client";
+
+import { ShoppingCart, UserRoundPen, X, LogIn } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,30 +10,53 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/authContext";
 
 interface DropdownHeaderProps {
   icone: ReactNode;
 }
 
 const DropdownHeader = ({ icone }: DropdownHeaderProps) => {
+  const { isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  const goTo = (path: string) => {
+    router.push(path);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{icone}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <UserRoundPen size={12} />
-          Perfil
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <ShoppingCart size={12} />
-          Meus pedidos
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <X size={12} className="text-red-500" />
-          Sair
-        </DropdownMenuItem>
+        {isAuthenticated ? (
+          <>
+            <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => goTo("/perfil")}>
+              <UserRoundPen size={14} className="mr-2" />
+              Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => goTo("/pedidos")}>
+              <ShoppingCart size={14} className="mr-2" />
+              Meus pedidos
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <X size={14} className="mr-2 text-red-500" />
+              Sair
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem onClick={() => goTo("/login")}>
+            <LogIn size={14} className="mr-2 text-blue-500" />
+            Fazer login
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

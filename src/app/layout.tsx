@@ -7,6 +7,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { usePathname } from "next/navigation";
 import { CartProvider } from "@/context/cartContext";
+import { AuthProvider } from "@/context/authContext"; // ✅ Adicionado
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -24,12 +25,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-        <CartProvider>
-          {!isAdmin && <WhatsappButton />}
-          {!isAdmin && <Header />}
-          {children}
-          {!isAdmin && <Footer />}
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <div className="min-h-screen flex flex-col">
+              {!isAdmin && <WhatsappButton />}
+              {!isAdmin && <Header />}
+              
+              {/* Conteúdo principal ocupa o restante do espaço */}
+              <main className="flex-grow">{children}</main>
+              
+              {!isAdmin && <Footer />}
+            </div>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
