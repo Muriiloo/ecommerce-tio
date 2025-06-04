@@ -35,9 +35,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <div className="p-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
-                <button
-                  onClick={() => addToCart({ ...item, quantity: 1 })}
-                >
+                <button onClick={() => addToCart({ ...item, quantity: 1 })}>
                   <ShoppingCart className="hover:text-blue-600 transition" />
                 </button>
               </div>
