@@ -70,8 +70,10 @@ const Header = () => {
             </Link>
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
-            <DropdownHeader icone={<User size={24} className="text-white" />} />
+          <div className="hidden md:flex items-center justify-center gap-4">
+            <DropdownHeader
+              icone={<User size={24} className="text-white mb-1" />}
+            />
             <MiniCart />
           </div>
 

@@ -52,7 +52,7 @@ const Home = async () => {
                       priority={idx === 0}
                       sizes="100vw"
                     />
-                    {/* Overlay com gradiente para melhor legibilidade */}
+
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
                       <div className="text-center text-white">
                         <h1 className="text-4xl md:text-6xl font-bold mb-4">
