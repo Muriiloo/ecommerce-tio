@@ -6,12 +6,11 @@ type CartItem = {
   id: string;
   name: string;
   price: number;
-  image?: string;
+  image?: string | null;
   quantity: number;
   selectedSize?: string;
   selectedColor?: string;
 };
-
 
 type CartContextType = {
   cart: CartItem[];
@@ -32,28 +31,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [isMiniCartOpen, setMiniCartOpen] = useState(false);
 
   const addToCart = (item: CartItem) => {
-    setCart(prev =>
-      prev.find(i => i.id === item.id)
-        ? prev.map(i =>
-            i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+    setCart((prev) =>
+      prev.find((i) => i.id === item.id)
+        ? prev.map((i) =>
+            i.id === item.id
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
           )
         : [...prev, item]
     );
   };
 
   const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(i => i.id !== id));
+    setCart((prev) => prev.filter((i) => i.id !== id));
   };
 
   const increaseQty = (id: string) => {
-    setCart(prev =>
-      prev.map(i => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i))
+    setCart((prev) =>
+      prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i))
     );
   };
 
   const decreaseQty = (id: string) => {
-    setCart(prev =>
-      prev.map(i =>
+    setCart((prev) =>
+      prev.map((i) =>
         i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i
       )
     );

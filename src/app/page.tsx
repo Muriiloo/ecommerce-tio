@@ -14,6 +14,9 @@ import { db } from "@/lib/prisma";
 import Image from "next/image";
 
 const Home = async () => {
+  const products = await db.product.findMany({});
+  const transformedProducts = transformProducts(products);
+
   const images = [
     {
       src: "/teste.jpg",
@@ -32,11 +35,9 @@ const Home = async () => {
     },
   ];
 
-  const products = await db.product.findMany({});
-  const transformedProducts = transformProducts(products);
-
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Seção do carrossel de banners */}
       <section className="relative">
         <Carousel className="w-full h-[500px] md:h-[600px]">
           <CarouselContent>
@@ -84,8 +85,10 @@ const Home = async () => {
           </p>
         </div>
 
-        <div>
-          <ProductCard product={transformedProducts} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {transformedProducts.map((produto) => (
+            <ProductCard key={produto.id} product={produto} />
+          ))}
         </div>
       </section>
     </div>

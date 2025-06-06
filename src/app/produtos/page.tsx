@@ -1,7 +1,16 @@
 import { transformProducts } from "@/lib/transformedProducts";
 import ProductCard from "@/components/productCard";
 import { db } from "@/lib/prisma";
-import { Sparkles, Filter, Grid3X3, List, Search, Tag, Shirt, Heart } from "lucide-react";
+import {
+  Sparkles,
+  Filter,
+  Grid3X3,
+  List,
+  Search,
+  Tag,
+  Shirt,
+  Heart,
+} from "lucide-react";
 
 const ProdutosPage = async () => {
   const products = await db.product.findMany({});
@@ -11,7 +20,7 @@ const ProdutosPage = async () => {
     { name: "Feminino", count: 120, color: "from-pink-500 to-rose-600" },
     { name: "Masculino", count: 80, color: "from-blue-500 to-indigo-600" },
     { name: "Infantil", count: 45, color: "from-green-500 to-emerald-600" },
-    { name: "Acessórios", count: 35, color: "from-purple-500 to-violet-600" }
+    { name: "Acessórios", count: 35, color: "from-purple-500 to-violet-600" },
   ];
 
   return (
@@ -32,7 +41,8 @@ const ProdutosPage = async () => {
               Nossa Coleção
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              Descubra peças únicas e tendências da moda que combinam com seu estilo pessoal
+              Descubra peças únicas e tendências da moda que combinam com seu
+              estilo pessoal
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <span className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-gray-700 shadow-lg border border-white/20">
@@ -60,7 +70,7 @@ const ProdutosPage = async () => {
                   className="w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder-gray-400"
                 />
               </div>
-              
+
               <div className="flex gap-3">
                 <button className="inline-flex items-center px-6 py-4 bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900 hover:to-orange-800 text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg">
                   <Filter className="w-5 h-5 mr-2" />
@@ -78,14 +88,23 @@ const ProdutosPage = async () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
             {categories.map((category, index) => (
-              <div key={index} className="group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer">
-                <div className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+              <div
+                key={index}
+                className="group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+              >
+                <div
+                  className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                >
                   <div className="w-full h-full flex items-center justify-center">
                     <Shirt className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <h3 className="font-bold text-gray-900 text-lg mb-1">{category.name}</h3>
-                <p className="text-gray-600 text-sm">{category.count} produtos</p>
+                <h3 className="font-bold text-gray-900 text-lg mb-1">
+                  {category.name}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {category.count} produtos
+                </p>
               </div>
             ))}
           </div>
@@ -102,7 +121,7 @@ const ProdutosPage = async () => {
                   {transformedProducts.length} produtos encontrados
                 </p>
               </div>
-              
+
               <div className="flex items-center gap-4">
                 <select className="px-4 py-3 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700">
                   <option>Mais Recentes</option>
@@ -113,11 +132,11 @@ const ProdutosPage = async () => {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent rounded-2xl"></div>
-              
-              <div className="relative bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                <ProductCard product={transformedProducts} />
+            <div className="relative bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {transformedProducts.map((produto) => (
+                  <ProductCard key={produto.id} product={produto} />
+                ))}
               </div>
             </div>
           </div>

@@ -1,88 +1,51 @@
 "use client";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/lib/supabase-client";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState, useRef } from "react";
 
-const Produtos = () => {
+export default function CadastrarProduto() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImageFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
     setSuccessMsg("");
 
     if (!name || !price || !stockQuantity || !imageFile) {
-      setErrorMsg("Por favor, preencha todos os campos obrigatórios.");
+      setErrorMsg("Preencha todos os campos obrigatórios.");
       return;
     }
 
-    //Upload da imagem para o Supabase Storage
-    let imageUrl = "";
-    try {
-      const fileExt = imageFile.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("produtos")
-        .upload(filePath, imageFile);
-
-      if (!uploadError) {
-        setErrorMsg("Erro ao fazer upload da imagem.");
-        return;
-      }
-
-      const { data: urlData } = supabase.storage
-        .from("produtos")
-        .getPublicUrl(filePath);
-
-      imageUrl = urlData.publicUrl;
-    } catch (error) {
-      setErrorMsg("Erro ao fazer upload da imagem." + error);
-      return;
-    }
+    // 1) Monta o FormData
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("stockQuantity", stockQuantity);
+    formData.append("image", imageFile);
 
     try {
+      // 2) Envia para /api/product
       const response = await fetch("/api/product", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          description,
-          price: Number(price),
-          stockQuantity: Number(stockQuantity),
-          imageUrl,
-        }),
+        body: formData, // NUNCA defina headers ao enviar FormData
       });
-
       const result = await response.json();
-      if (result.success) {
+
+      if (response.ok && result.success) {
         setSuccessMsg("Produto cadastrado com sucesso!");
         setTimeout(() => {
           setSuccessMsg("");
           router.refresh();
         }, 1500);
+        // limpa campos
         setName("");
         setDescription("");
         setPrice("");
@@ -92,8 +55,9 @@ const Produtos = () => {
       } else {
         setErrorMsg(result.error || "Erro ao cadastrar produto.");
       }
-    } catch (error) {
-      setErrorMsg(`Erro ao cadastrar produto. ${error}`);
+    } catch (err) {
+      console.error("Front fetch error:", err);
+      setErrorMsg("Erro ao cadastrar produto.");
     }
   };
 
@@ -104,59 +68,98 @@ const Produtos = () => {
       </h2>
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <Label htmlFor="name">Nome*</Label>
-          <Input
+          <label
+            className="block text-sm font-medium text-gray-600"
+            htmlFor="name"
+          >
+            Nome*
+          </label>
+          <input
             id="name"
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
           />
         </div>
         <div>
-          <Label htmlFor="description">Descrição</Label>
-          <Textarea
+          <label
+            className="block text-sm font-medium text-gray-600"
+            htmlFor="description"
+          >
+            Descrição
+          </label>
+          <textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
           />
         </div>
         <div>
-          <Label htmlFor="price">Preço* (Ex: 39.90)</Label>
-          <Input
+          <label
+            className="block text-sm font-medium text-gray-600"
+            htmlFor="price"
+          >
+            Preço* (Ex: 39.90)
+          </label>
+          <input
             id="price"
             type="number"
             min="0"
             step="0.01"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
           />
         </div>
         <div>
-          <Label htmlFor="stockQuantity">Quantidade em Estoque*</Label>
-          <Input
+          <label
+            className="block text-sm font-medium text-gray-600"
+            htmlFor="stockQuantity"
+          >
+            Quantidade em Estoque*
+          </label>
+          <input
             id="stockQuantity"
             type="number"
             min="0"
             value={stockQuantity}
             onChange={(e) => setStockQuantity(e.target.value)}
+            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
             required
           />
         </div>
         <div>
-          <Label htmlFor="image">Imagem do produto*</Label>
-          <Input
+          <label
+            className="block text-sm font-medium text-gray-600"
+            htmlFor="image"
+          >
+            Imagem do produto*
+          </label>
+          <input
             id="image"
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setImageFile(e.target.files[0]);
+              }
+            }}
             ref={fileInputRef}
+            className="mt-1 w-full"
             required
           />
         </div>
-        <Button type="submit" className="w-full bg-blue-600 text-white">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+        >
           Cadastrar produto
-        </Button>
+        </button>
+
         {errorMsg && <div className="text-red-500 text-sm">{errorMsg}</div>}
         {successMsg && (
           <div className="text-green-600 text-sm">{successMsg}</div>
@@ -164,6 +167,4 @@ const Produtos = () => {
       </form>
     </div>
   );
-};
-
-export default Produtos;
+}
