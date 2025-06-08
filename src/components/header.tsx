@@ -1,7 +1,10 @@
+"use client";
+
 import MiniCart from "./miniCart";
 
 import Link from "next/link";
 import {
+  CircleUserRound,
   House,
   Menu,
   MessageCircle,
@@ -20,8 +23,26 @@ import {
   MenubarTrigger,
 } from "./ui/menubar";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const Header = () => {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/user")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user && data.user.isAdmin) {
+          setIsAdmin(true);
+          console.log("é admin");
+        } else {
+          setIsAdmin(false);
+          console.log("não é admin");
+        }
+      })
+      .catch(() => setIsAdmin(false));
+  }, []);
+
   return (
     <header className="bg-black sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,6 +87,15 @@ const Header = () => {
               Contato
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
             </Link>
+            {isAdmin && (
+              <Link
+                href="/admin/dashboard"
+                className="text-white hover:text-gray-300 px-3 py-2 text-sm lg:text-base font-medium transition-all duration-300 hover:scale-105 relative group"
+              >
+                Admin
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-white transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            )}
           </nav>
 
           <div className="hidden md:flex items-center justify-center gap-4">
@@ -78,6 +108,9 @@ const Header = () => {
           {/* Menu Mobile */}
           <div className="md:hidden flex items-center gap-4">
             <DropdownHeader icone={<User className="text-white" />} />
+            <div className="mt-1">
+              <MiniCart />
+            </div>
             <Menubar className="bg-gray-100">
               <MenubarMenu>
                 <MenubarTrigger>
@@ -86,23 +119,33 @@ const Header = () => {
                 <MenubarContent>
                   <MenubarItem>
                     <House />
-                    Home
+                    <Link href="/">Home</Link>
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem>
                     <ShoppingBasket />
-                    Produtos
+                    <Link href="/produtos">Produtos</Link>
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem>
                     <MessageCircle />
-                    Sobre nós
+                    <Link href="/sobre">Sobre nós</Link>
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem>
                     <Phone />
-                    Contato
+                    <Link href="/contato">Contato</Link>
                   </MenubarItem>
+                  <MenubarSeparator />
+                  {isAdmin && (
+                    <div>
+                      <MenubarItem>
+                        <CircleUserRound />
+                        <Link href="/admin/dashboard">Admin</Link>
+                      </MenubarItem>
+                      <MenubarSeparator />
+                    </div>
+                  )}
                 </MenubarContent>
               </MenubarMenu>
             </Menubar>

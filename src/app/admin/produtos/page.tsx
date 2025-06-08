@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CadastrarProduto() {
@@ -12,6 +12,49 @@ export default function CadastrarProduto() {
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  useEffect(() => {
+    const validateUser = async () => {
+      const res = await fetch("/api/user");
+      const data = await res.json();
+
+      if (!data.user || !data.user.isAdmin) {
+        router.replace("/unauthorized");
+      } else {
+        setIsLoadingUser(false);
+      }
+    };
+
+    validateUser();
+  }, [router]);
+
+  if (isLoadingUser)
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh]">
+        <svg
+          className="animate-spin h-10 w-10 text-blue-600 mb-4"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v8z"
+          />
+        </svg>
+        <span className="text-lg font-medium text-gray-600">Carregando...</span>
+      </div>
+    );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,9 +1,16 @@
 import { getMonthlyRevenue } from "@/app/_actions/getMonthlyRevenue";
 import MonthlyRevenueChart from "../_components/monthlyRevenueChart";
 import CardValueTotal from "../_components/cardValueTotal";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
 
 const Dashboard = async () => {
   const revenue = await getMonthlyRevenue();
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.isAdmin) {
+    redirect("/unauthorized");
+  }
 
   return (
     <div className="p-4 space-y-8">

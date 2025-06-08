@@ -18,7 +18,7 @@ interface DropdownHeaderProps {
 }
 
 const DropdownHeader = ({ icone }: DropdownHeaderProps) => {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -36,7 +36,7 @@ const DropdownHeader = ({ icone }: DropdownHeaderProps) => {
       <DropdownMenuContent>
         {isAuthenticated ? (
           <>
-            <DropdownMenuLabel>Minha conta</DropdownMenuLabel>
+            <DropdownMenuLabel>Olá, {user?.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => goTo("/perfil")}>
               <UserRoundPen size={14} className="mr-2" />
