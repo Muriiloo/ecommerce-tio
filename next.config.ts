@@ -1,11 +1,8 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+// next.config.js
+module.exports = {
   images: {
-    domains: [
-      "images.unsplash.com", // libera o Unsplash
-      // adicione outros domínios aqui, se necessário
-    ],
+    domains: ["images.unsplash.com"],
+    // ou, para padrões mais flexíveis:
+    // remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com', port: '', pathname: '/**' }],
   },
 };
-
-module.exports = nextConfig;

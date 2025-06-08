@@ -1,59 +1,54 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { signIn, useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const { status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm">
+        <div className="w-16 h-16 border-4 border-t-blue-600 border-gray-200 rounded-full animate-spin"></div>
+
+        <h2 className="mt-4 text-lg font-medium text-gray-700">
+          Carregando...
+        </h2>
+      </div>
+    );
+  }
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
 
-    const { data: authData, error: authError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password: password,
-      });
+    const result = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
 
-    if (authError || !authData?.user) {
-      setErrorMsg(
-        authError?.message || "Erro ao fazer login. Verifique suas credenciais."
-      );
+    if (result?.error) {
+      setErrorMsg(result.error);
       return;
     }
 
-    try {
-      const supabaseUserId = authData.user.id;
-      const res = await fetch("/api/user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: supabaseUserId,
-          email: authData.user.email,
-          name: authData.user.user_metadata?.full_name || "Usuário",
-        }),
-      });
-
-      const result = await res.json();
-      if (!result.success) {
-        setErrorMsg("Erro ao sincronizar usuário.");
-        return;
-      }
-
-      router.push("/");
-    } catch (error) {
-      setErrorMsg("Erro ao sincronizar usuário no banco." + error);
-    }
+    router.push("/");
   };
 
   return (
@@ -75,8 +70,8 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              className="mt-1 w-full"
             />
           </div>
 
@@ -93,14 +88,14 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               required
+              className="mt-1 w-full"
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-lg font-semibold"
+            className="w-full bg-black text-white py-2 rounded-lg"
           >
             Entrar
           </Button>
@@ -109,10 +104,22 @@ const LoginPage = () => {
             <div className="text-red-600 text-sm text-center">{errorMsg}</div>
           )}
 
-          <div className="text-center mt-2">
-            <Link href="#" className="text-sm text-blue-600 hover:underline">
+          <div className="flex flex-col text-center mt-2 gap-2">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
               Esqueceu a senha?
             </Link>
+            <span className="text-sm ">
+              Não possui conta?{" "}
+              <Link
+                className="text-sm text-blue-600 hover:underline"
+                href="/registro"
+              >
+                Cadastre-se
+              </Link>
+            </span>
           </div>
         </form>
       </div>

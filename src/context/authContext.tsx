@@ -1,54 +1,63 @@
+// src/context/AuthContext.tsx
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useSession, signOut, SessionProvider } from "next-auth/react";
 
-// Define a interface para o usuário
 interface User {
-  name: string;
-  email: string;
-  avatar?: string;
-  phone?: string;
-  address?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  // adicione mais campos do session.user se precisar
 }
 
-// Define o formato do contexto
 interface AuthContextProps {
   isAuthenticated: boolean;
   user: User | null;
-  login: (userData: User) => void;
   logout: () => void;
 }
 
-// Cria o contexto com valor inicial undefined
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-// Provider para encapsular a aplicação
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProviderWrapper({ children }: { children: ReactNode }) {
+  // Envolva o NextAuth SessionProvider aqui
+  return (
+    <SessionProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </SessionProvider>
+  );
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const { data: session, status } = useSession();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  // Simula login com dados de usuário
-  const login = (userData: User) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
+  useEffect(() => {
+    setIsAuthenticated(status === "authenticated");
+    setUser(session?.user ?? null);
+  }, [status, session]);
 
-  // Limpa dados de usuário
   const logout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
+    signOut({ redirect: false });
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-// Hook customizado para acessar o contexto
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx)
+    throw new Error("useAuth must be used dentro de AuthProviderWrapper");
+  return ctx;
 };

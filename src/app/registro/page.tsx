@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { supabase } from "@/lib/supabase-client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -21,58 +21,24 @@ const RegisterPage = () => {
     setErrorMsg("");
     setSuccessMsg("");
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name,
-        },
-      },
-    });
-
-    console.log({ data, error });
-
-    if (error) {
-      if (
-        error.message?.toLowerCase().includes("user already registered") ||
-        error.message?.toLowerCase().includes("email already registered") ||
-        error.message?.toLowerCase().includes("already exists")
-      ) {
-        setErrorMsg("E-mail já cadastrado. Faça login ou recupere sua senha.");
-        return;
-      } else {
-        setErrorMsg(error.message || "Erro ao cadastrar");
-        return;
-      }
-    }
-
     try {
-      const user = data.user;
-      if (user && user.id) {
-        const res = await fetch("/api/user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: user.id,
-            email: user.email,
-            name,
-          }),
-        });
+      const result = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-        const result = await res.json();
-        if (!result.success) {
-          setErrorMsg("Erro ao criar usuário no banco de dados");
-          return;
-        }
+      if (!result.ok) {
+        setErrorMsg("Erro durante a requisição");
+        return;
       }
 
-      setSuccessMsg("Usuário cadastrado com sucesso!");
-      setTimeout(() => router.push("/login"), 2000);
-    } catch (error) {
-      setErrorMsg("Erro ao sincronizar cadastro." + error);
+      setSuccessMsg("Cadastrado com sucesso!");
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
+    } catch (err) {
+      console.error(err);
     }
   };
 

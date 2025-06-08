@@ -1,5 +1,3 @@
-"use client";
-
 import MiniCart from "./miniCart";
 
 import Link from "next/link";

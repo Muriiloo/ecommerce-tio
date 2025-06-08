@@ -52,6 +52,7 @@ const Home = async () => {
                       className="object-cover opacity-80"
                       priority={idx === 0}
                       sizes="100vw"
+                      unoptimized
                     />
 
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
