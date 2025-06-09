@@ -12,6 +12,8 @@ import {
   Heart,
 } from "lucide-react";
 
+
+
 const ProdutosPage = async () => {
   const products = await db.product.findMany({});
   const transformedProducts = transformProducts(products);
