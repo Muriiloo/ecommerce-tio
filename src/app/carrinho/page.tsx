@@ -3,7 +3,8 @@
 import { useCart } from "@/context/cartContext";
 
 const CarrinhoPage = () => {
-  const { cart, removeFromCart, increaseQty, decreaseQty, clearCart } = useCart();
+  const { cart, removeFromCart, increaseQty, decreaseQty, clearCart } =
+    useCart();
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -26,6 +27,16 @@ const CarrinhoPage = () => {
                   <p className="text-sm text-gray-600">
                     {item.quantity}x R${item.price.toFixed(2)}
                   </p>
+                  {item.selectedSize && (
+                    <p className="text-xs text-gray-500">
+                      Tamanho: {item.selectedSize}
+                    </p>
+                  )}
+                  {item.selectedColor && (
+                    <p className="text-xs text-gray-500">
+                      Cor: {item.selectedColor}
+                    </p>
+                  )}
                   <div className="flex gap-2 mt-1">
                     <button
                       onClick={() => decreaseQty(item.id)}
