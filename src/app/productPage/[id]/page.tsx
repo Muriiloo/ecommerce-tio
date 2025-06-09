@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { notFound } from "next/navigation";
-import ProductDetails from "./productDetails";
+import ProductDetails from "../../../components/productDetails";
 
 const prisma = new PrismaClient();
 

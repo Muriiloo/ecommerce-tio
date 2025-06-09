@@ -68,6 +68,8 @@ model Product {
   description   String
   price         Decimal        @db.Decimal(10, 2)
   stockQuantity Int
+  size           String?  
+  color          String?  
   imageUrl      String
   createdAt     DateTime       @default(now())
   orderItems    OrderItem[]
@@ -91,6 +93,8 @@ model OrderItem {
   productId       String
   quantity        Int
   priceAtPurchase Decimal @db.Decimal(10, 2)
+  selectedSize   String?
+  selectedColor  String?
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])
