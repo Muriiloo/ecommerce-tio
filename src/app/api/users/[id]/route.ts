@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/prisma";
 
-type Params = {
-  params: { id: string };
-};
-
-export async function DELETE(req: Request, { params }: Params) {
+export async function DELETE(
+  req: Request,
+  context: { params: { id: string } }
+) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
 
     await db.user.delete({ where: { id } });
 
     return NextResponse.json({ message: "Usuário excluído com sucesso" });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Erro ao excluir usuário" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erro ao excluir usuário" },
+      { status: 500 }
+    );
   }
 }

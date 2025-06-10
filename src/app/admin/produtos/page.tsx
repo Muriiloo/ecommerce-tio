@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -111,16 +112,13 @@ export default function CadastrarProduto() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        // limpa mensagens e campos
         setSuccessMsg("Produto cadastrado com sucesso!");
+        setProducts((prev) => [...prev, result.product]);
         setName("");
         setDescription("");
         setPrice("");
         setStockQuantity("");
         fileInputRef.current!.value = "";
-
-        setProducts((item) => [...item, result.product]);
-
         setTimeout(() => setSuccessMsg(""), 1500);
       } else {
         setErrorMsg(result.error || "Erro ao cadastrar produto.");
@@ -134,167 +132,166 @@ export default function CadastrarProduto() {
     if (!confirm("Tem certeza que deseja excluir?")) return;
     const res = await fetch(`/api/product/${id}`, { method: "DELETE" });
     if (res.ok) {
-      setProducts((item) => item.filter((p) => p.id !== id));
-      router.refresh();
+      setProducts((prev) => prev.filter((p) => p.id !== id));
     } else {
-      alert("erro");
+      alert("Erro ao excluir produto.");
     }
   };
 
   return (
-    <div className="w-full max-w-screen-xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-lg space-y-8">
-      <section className="space-y-6">
-        <h2 className="text-3xl font-bold text-gray-900">Cadastrar Produto</h2>
-        <form
-          className="grid grid-cols-1 gap-4 md:grid-cols-2"
-          onSubmit={handleSubmit}
-        >
-          <div className="col-span-2">
-            <Label htmlFor="name">Nome*</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Nome do produto"
-              required
-              className="mt-1"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <Label htmlFor="description">Descrição</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva o produto"
-              className="mt-1 h-24"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="price">Preço* (Ex: 39.90)</Label>
-            <Input
-              id="price"
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="R$"
-              required
-              className="mt-1"
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="stockQuantity">Quantidade em Estoque*</Label>
-            <Input
-              id="stockQuantity"
-              type="number"
-              min="0"
-              value={stockQuantity}
-              onChange={(e) => setStockQuantity(e.target.value)}
-              placeholder="0"
-              required
-              className="mt-1"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <Label htmlFor="image">Imagem do produto*</Label>
-            <Input
-              id="image"
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-              className="mt-1"
-            />
-          </div>
-
-          <div className="col-span-2 text-right">
-            <Button
-              type="submit"
-              variant="default"
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Cadastrar
-            </Button>
-          </div>
-
-          {errorMsg && <p className="col-span-2 text-red-500">{errorMsg}</p>}
-          {successMsg && (
-            <p className="col-span-2 text-green-600">{successMsg}</p>
-          )}
-        </form>
-      </section>
-
-      <section>
-        <h3 className="text-2xl font-semibold mb-4">Produtos Cadastrados</h3>
-        <div className="overflow-x-auto">
-          <Table className="w-full table-fixed">
-            <TableHeader>
-              <TableRow className="bg-gray-100 sticky top-0">
-                <TableHead className="px-4 py-6 text-left text-sm font-semibold uppercase">
-                  Nome
-                </TableHead>
-                <TableHead className="px-4 py-6 text-left text-sm font-semibold uppercase">
-                  Descrição
-                </TableHead>
-                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
-                  Preço
-                </TableHead>
-                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
-                  Estoque
-                </TableHead>
-                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
-                  Ações
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="py-6 text-center text-gray-500"
-                  >
-                    Nenhum produto cadastrado.
-                  </TableCell>
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-screen-xl mx-auto bg-white rounded-lg shadow overflow-hidden">
+        <section className="p-8 space-y-6">
+          <h2 className="text-3xl font-bold text-gray-900">
+            Cadastrar Produto
+          </h2>
+          <form
+            className="grid grid-cols-1 gap-4 md:grid-cols-2"
+            onSubmit={handleSubmit}
+          >
+            <div className="col-span-2">
+              <Label htmlFor="name">Nome*</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Nome do produto"
+                required
+                className="mt-1"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="description">Descrição</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Descreva o produto"
+                className="mt-1 h-24"
+              />
+            </div>
+            <div>
+              <Label htmlFor="price">Preço* (Ex: 39.90)</Label>
+              <Input
+                id="price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="R$"
+                required
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="stockQuantity">Quantidade em Estoque*</Label>
+              <Input
+                id="stockQuantity"
+                type="number"
+                min="0"
+                value={stockQuantity}
+                onChange={(e) => setStockQuantity(e.target.value)}
+                placeholder="0"
+                required
+                className="mt-1"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="image">Imagem do produto*</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                className="mt-1"
+              />
+            </div>
+            <div className="col-span-2 text-right">
+              <Button
+                type="submit"
+                variant="default"
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                Cadastrar
+              </Button>
+            </div>
+            {errorMsg && <p className="col-span-2 text-red-500">{errorMsg}</p>}
+            {successMsg && (
+              <p className="col-span-2 text-green-600">{successMsg}</p>
+            )}
+          </form>
+        </section>
+        <section className="p-8">
+          <h3 className="text-2xl font-semibold mb-4">Produtos Cadastrados</h3>
+          <div className="overflow-x-auto bg-white rounded-b-lg">
+            <Table className="min-w-full divide-y divide-gray-200">
+              <TableHeader>
+                <TableRow className="bg-gray-100 sticky top-0">
+                  <TableHead className="px-4 py-3 text-left text-sm font-semibold uppercase text-gray-700">
+                    Nome
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-left text-sm font-semibold uppercase text-gray-700">
+                    Descrição
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-right text-sm font-semibold uppercase text-gray-700">
+                    Preço
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-right text-sm font-semibold uppercase text-gray-700">
+                    Estoque
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-center text-sm font-semibold uppercase text-gray-700">
+                    Ações
+                  </TableHead>
                 </TableRow>
-              ) : (
-                products.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="px-4 py-6 text-sm font-medium text-gray-800">
-                      {item.name}
-                    </TableCell>
-                    <TableCell className="px-4 py-6 text-sm text-gray-600 truncate">
-                      {item.description || "-"}
-                    </TableCell>
-                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
-                      R$ {Number(item.price).toFixed(2)}
-                    </TableCell>
-                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
-                      {item.stockQuantity}
-                    </TableCell>
-                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
-                      <Button
-                        onClick={() => handleDelete(item.id)}
-                        variant="destructive"
-                        size="sm"
-                        className="px-3 py-1"
-                      >
-                        Excluir
-                      </Button>
+              </TableHeader>
+              <TableBody className="divide-y divide-gray-200">
+                {products.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="py-6 text-center text-gray-500"
+                    >
+                      Nenhum produto cadastrado.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </section>
+                ) : (
+                  products.map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className="bg-white hover:bg-gray-50 transition"
+                    >
+                      <TableCell className="px-4 py-4 text-sm font-medium text-gray-800">
+                        {item.name}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-600 truncate">
+                        {item.description || "-"}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-800 text-right">
+                        R$ {Number(item.price).toFixed(2)}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-800 text-right">
+                        {item.stockQuantity}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-gray-800 text-center">
+                        <Button
+                          onClick={() => handleDelete(item.id)}
+                          variant="destructive"
+                          size="sm"
+                          className="px-3 py-1"
+                        >
+                          Excluir
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
