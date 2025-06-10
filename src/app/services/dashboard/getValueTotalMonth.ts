@@ -1,7 +1,5 @@
 import { db } from "@/lib/prisma";
 
-//TO AJUSTANDO ESSA QUERY AINDA NÃO MEXE
-
 export const getValueTotalMonth = async () => {
   //pegando a data atual
   const now = new Date();
@@ -22,7 +20,7 @@ export const getValueTotalMonth = async () => {
       totalAmount: true,
     },
     where: {
-      status: "paid",
+      status: "pending", // ajustar depois para filtrar por pagos
       createdAt: {
         gte: startOfMonth,
         lte: endOfMonth,
@@ -30,6 +28,5 @@ export const getValueTotalMonth = async () => {
     },
   });
 
-  console.log(result._sum.totalAmount);
   return result._sum.totalAmount?.toFixed(2) || "0.00";
 };
