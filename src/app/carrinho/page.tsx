@@ -1,12 +1,57 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useAuth } from "@/context/authContext";
 import { useCart } from "@/context/cartContext";
+import { CreditCard } from "lucide-react";
+import { useState } from "react";
 
 const CarrinhoPage = () => {
   const { cart, removeFromCart, increaseQty, decreaseQty, clearCart } =
     useCart();
 
+  const { user } = useAuth();
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handlePayment = async () => {
+    try {
+      const response = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user?.id,
+          totalAmount: total,
+          paymentMethod,
+          items: cart,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Pedido realizado com sucesso!");
+        setSuccessMsg("Pedido realizado com sucesso!");
+        clearCart();
+      } else {
+        alert("Erro ao salvar pedido.");
+        setErrorMsg("Erro ao gravar pedido.");
+      }
+    } catch (err) {
+      alert("Erro ao conectar com o server" + err);
+      setErrorMsg("Erro de servidor.");
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4">
@@ -63,16 +108,46 @@ const CarrinhoPage = () => {
           </ul>
 
           <div className="mt-6">
-            <p className="text-xl font-bold">Total: R${total.toFixed(2)}</p>
-            <button
+            <div className="flex justify-between">
+              <p className="text-xl font-bold">Total: R${total.toFixed(2)}</p>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger className="w-[230px]">
+                  <SelectValue placeholder="Forma de pagamento..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Pagamento</SelectLabel>
+                    <SelectItem value="pix">Pix</SelectItem>
+                    <SelectItem value="credito">Cartão de crédito</SelectItem>
+                    <SelectItem value="debito">Cartão de débito</SelectItem>
+                    <SelectItem value="boleto">Boleto</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button
               onClick={clearCart}
-              className="mt-2 text-sm text-red-600 underline"
+              variant="ghost"
+              className="mt-2 text-sm text-red-500 hover:text-white hover:bg-red-500 px-4 py-2 font-medium transition rounded"
             >
               Limpar carrinho
-            </button>
-            <button className="block w-full mt-4 bg-black text-white py-2 rounded hover:bg-gray-800 transition">
+            </Button>
+
+            <Button
+              onClick={handlePayment}
+              className="flex items-center justify-center gap-2 w-full mt-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white py-3 rounded-xl shadow-md hover:brightness-110 transition-all font-semibold text-lg"
+            >
+              <CreditCard size={20} />
               Prosseguir com Pagamento
-            </button>
+            </Button>
+            {errorMsg && (
+              <div className="text-red-600 text-sm text-center">{errorMsg}</div>
+            )}
+            {successMsg && (
+              <div className="text-green-600 text-sm text-center">
+                {successMsg}
+              </div>
+            )}
           </div>
         </>
       )}

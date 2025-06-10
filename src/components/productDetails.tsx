@@ -27,6 +27,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
     addToCart({
       id: product.id + selectedSize + selectedColor,
+      productId: product.id,
       name: product.name,
       price: product.price,
       quantity: 1,

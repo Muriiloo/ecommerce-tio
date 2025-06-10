@@ -11,6 +11,7 @@ import {
 import { useSession, signOut, SessionProvider } from "next-auth/react";
 
 interface User {
+  id?: string;
   name?: string | null;
   email?: string | null;
   image?: string | null;
