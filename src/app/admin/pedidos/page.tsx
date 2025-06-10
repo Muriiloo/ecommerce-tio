@@ -1,13 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
 interface Order {
   id: string;
-  userId: string;
-  status: 'pending' | 'paid' | 'shipped' | 'cancelled';
+  status: "pending" | "paid" | "shipped" | "cancelled";
   totalAmount: number;
-  paymentMethod: string;
   createdAt: string;
 }
 
@@ -17,32 +16,28 @@ export default function PedidosPage() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('/api/orders');
+      const response = await fetch("/api/orders");
       const data = await response.json();
       setOrders(data || []);
     } catch (error) {
-      console.error('Erro ao buscar pedidos:', error);
+      console.error("Erro ao buscar pedidos:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const deleteOrder = async (id: string) => {
-    if (!confirm('Deseja realmente excluir este pedido?')) return;
-
+    if (!confirm("Deseja realmente excluir este pedido?")) return;
     try {
-      const res = await fetch(`/api/orders/${id}`, {
-        method: 'DELETE',
-      });
-
+      const res = await fetch(`/api/orders/${id}`, { method: "DELETE" });
       if (res.ok) {
         setOrders((prev) => prev.filter((order) => order.id !== id));
       } else {
-        alert('Erro ao excluir o pedido.');
+        alert("Erro ao excluir o pedido.");
       }
     } catch (error) {
-      console.error('Erro ao excluir pedido:', error);
-      alert('Erro ao excluir o pedido.');
+      console.error("Erro ao excluir pedido:", error);
+      alert("Erro ao excluir o pedido.");
     }
   };
 
@@ -51,49 +46,68 @@ export default function PedidosPage() {
   }, []);
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Pedidos</h1>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-semibold mb-6">Pedidos</h1>
 
       {loading ? (
-        <p>Carregando pedidos...</p>
+        <p className="text-gray-500">Carregando pedidos...</p>
       ) : orders.length === 0 ? (
-        <p>Nenhum pedido encontrado.</p>
+        <div className="text-center py-10 text-gray-500">
+          Nenhum pedido encontrado.
+        </div>
       ) : (
-        <table className="w-full border border-gray-300">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 text-left">ID</th>
-              <th className="p-2 text-left">Usuário</th>
-              <th className="p-2 text-left">Status</th>
-              <th className="p-2 text-left">Total</th>
-              <th className="p-2 text-left">Pagamento</th>
-              <th className="p-2 text-left">Criado em</th>
-              <th className="p-2 text-left">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="border-t border-gray-300">
-                <td className="p-2">{order.id}</td>
-                <td className="p-2">{order.userId}</td>
-                <td className="p-2 capitalize">{order.status}</td>
-                <td className="p-2">R$ {Number(order.totalAmount).toFixed(2)}</td>
-                <td className="p-2">{order.paymentMethod}</td>
-                <td className="p-2">
-                  {new Date(order.createdAt).toLocaleString()}
-                </td>
-                <td className="p-2">
-                  <button
-                    onClick={() => deleteOrder(order.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Excluir
-                  </button>
-                </td>
+        <div className="overflow-x-auto bg-white shadow rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase">
+                  Data do Pedido
+                </th>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-700 uppercase">
+                  Valor (R$)
+                </th>
+                <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase">
+                  Ações
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {orders.map((order) => (
+                <tr
+                  key={order.id}
+                  className="bg-white hover:bg-gray-50 transition"
+                >
+                  <td className="px-4 py-4 text-sm text-gray-800">
+                    {new Date(order.createdAt).toLocaleDateString("pt-BR", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-800 capitalize">
+                    {order.status}
+                  </td>
+                  <td className="px-4 py-4 text-sm  text-right font-medium text-green-600">
+                    R$ {Number(order.totalAmount).toFixed(2)}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-800 text-center">
+                    <Button
+                      onClick={() => deleteOrder(order.id)}
+                      variant="destructive"
+                      size="sm"
+                      className="px-3 py-1"
+                    >
+                      Excluir
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
