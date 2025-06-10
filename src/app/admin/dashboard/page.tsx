@@ -1,12 +1,16 @@
-import { getMonthlyRevenue } from "@/app/_actions/getMonthlyRevenue";
+import { getMonthlyRevenue } from "@/app/services/dashboard/getMonthlyRevenue";
 import MonthlyRevenueChart from "../_components/monthlyRevenueChart";
-import CardValueTotal from "../_components/cardValueTotal";
+import CardDashbord from "../_components/cardValueTotal";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
+import { getValueTotalMonth } from "@/app/services/dashboard/getValueTotalMonth";
+import { getTodayRevenue } from "@/app/services/dashboard/getTodayRevenue";
 
 const Dashboard = async () => {
   const revenue = await getMonthlyRevenue();
+  const totalMonth = await getValueTotalMonth();
+  const totalDay = await getTodayRevenue();
   const session = await getServerSession(authOptions);
   if (!session?.user?.isAdmin) {
     redirect("/unauthorized");
@@ -17,7 +21,8 @@ const Dashboard = async () => {
       <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        <CardValueTotal />
+        <CardDashbord title="Vendas do mês" total={totalMonth} />
+        <CardDashbord title="Vendas do dia" total={totalDay} />
       </div>
 
       <div className=" rounded-lg shadow-md w-full overflow-x-auto">

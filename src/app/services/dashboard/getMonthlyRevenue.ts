@@ -6,6 +6,7 @@ export const getMonthlyRevenue = async () => {
       DATE_FORMAT(MIN(createdAt), '%b %Y') AS month,
       SUM(totalAmount) AS total
     FROM \`Order\`
+    WHERE status = 'pending'
     GROUP BY YEAR(createdAt), MONTH(createdAt)
     ORDER BY YEAR(createdAt), MONTH(createdAt)
     `;
