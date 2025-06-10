@@ -47,7 +47,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
               {product.name}
             </h3>
             <button
-              onClick={() => addToCart({ ...product, quantity: 1 })}
+              onClick={() =>
+                addToCart({
+                  id: product.id,
+                  productId: product.id,
+                  name: product.name,
+                  price: product.price,
+                  quantity: 1,
+                  image: product.image,
+                })
+              }
               className="rounded-full bg-blue-50 p-2 shadow hover:bg-blue-600 hover:text-white transition-colors"
               title="Adicionar ao carrinho"
             >
