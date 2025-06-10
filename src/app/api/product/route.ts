@@ -41,10 +41,8 @@ export const POST = async (request: Request) => {
     await fs.writeFile(filePath, buffer);
 
     // 8) Monta a URL pública que será salva no banco
-    //    Depois, basta usar <img src={product.imageUrl} ... />
     const imageUrl = `/uploads/${safeFileName}`;
 
-    // 9) Cria o registro no banco via Prisma
     const created = await db.product.create({
       data: {
         name: name || "",
@@ -63,6 +61,18 @@ export const POST = async (request: Request) => {
     console.error("[Route POST /api/product] erro:", err);
     return NextResponse.json(
       { success: false, error: "Erro ao processar formulário." },
+      { status: 500 }
+    );
+  }
+};
+
+export const GET = async () => {
+  try {
+    const products = await db.product.findMany({});
+    return NextResponse.json({ products });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Erro ao buscar produtos", err },
       { status: 500 }
     );
   }
