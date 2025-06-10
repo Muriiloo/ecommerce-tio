@@ -1,6 +1,26 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+type Product = {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  stockQuantity: number;
+};
 
 export default function CadastrarProduto() {
   const router = useRouter();
@@ -13,20 +33,32 @@ export default function CadastrarProduto() {
   const [successMsg, setSuccessMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [, setIsLoadingProducts] = useState(true);
 
   useEffect(() => {
-    const validateUser = async () => {
+    async function validateUser() {
       const res = await fetch("/api/user");
       const data = await res.json();
+      if (!data.user?.isAdmin) router.replace("/unauthorized");
+      else setIsLoadingUser(false);
+    }
 
-      if (!data.user || !data.user.isAdmin) {
-        router.replace("/unauthorized");
-      } else {
-        setIsLoadingUser(false);
+    async function fetchProducts() {
+      try {
+        setIsLoadingProducts(true);
+        const res = await fetch("/api/product");
+        const data = await res.json();
+        setProducts(data.products || []);
+      } catch {
+        setProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
       }
-    };
+    }
 
     validateUser();
+    fetchProducts();
   }, [router]);
 
   if (isLoadingUser)
@@ -34,8 +66,6 @@ export default function CadastrarProduto() {
       <div className="flex flex-col items-center justify-center min-h-[50vh]">
         <svg
           className="animate-spin h-10 w-10 text-blue-600 mb-4"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
           viewBox="0 0 24 24"
         >
           <circle
@@ -66,7 +96,6 @@ export default function CadastrarProduto() {
       return;
     }
 
-    // 1) Monta o FormData
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
@@ -75,139 +104,197 @@ export default function CadastrarProduto() {
     formData.append("image", imageFile);
 
     try {
-      // 2) Envia para /api/product
       const response = await fetch("/api/product", {
         method: "POST",
-        body: formData, // NUNCA defina headers ao enviar FormData
+        body: formData,
       });
       const result = await response.json();
 
       if (response.ok && result.success) {
+        // limpa mensagens e campos
         setSuccessMsg("Produto cadastrado com sucesso!");
-        setTimeout(() => {
-          setSuccessMsg("");
-          router.refresh();
-        }, 1500);
-        // limpa campos
         setName("");
         setDescription("");
         setPrice("");
         setStockQuantity("");
-        setImageFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
+        fileInputRef.current!.value = "";
+
+        setProducts((item) => [...item, result.product]);
+
+        setTimeout(() => setSuccessMsg(""), 1500);
       } else {
         setErrorMsg(result.error || "Erro ao cadastrar produto.");
       }
-    } catch (err) {
-      console.error("Front fetch error:", err);
+    } catch {
       setErrorMsg("Erro ao cadastrar produto.");
     }
   };
 
-  return (
-    <div className="max-w-xl mx-auto mt-10 p-8 bg-white rounded-lg shadow space-y-6">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">
-        Cadastrar Produto
-      </h2>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-600"
-            htmlFor="name"
-          >
-            Nome*
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            required
-          />
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-600"
-            htmlFor="description"
-          >
-            Descrição
-          </label>
-          <textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-          />
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-600"
-            htmlFor="price"
-          >
-            Preço* (Ex: 39.90)
-          </label>
-          <input
-            id="price"
-            type="number"
-            min="0"
-            step="0.01"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            required
-          />
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-600"
-            htmlFor="stockQuantity"
-          >
-            Quantidade em Estoque*
-          </label>
-          <input
-            id="stockQuantity"
-            type="number"
-            min="0"
-            value={stockQuantity}
-            onChange={(e) => setStockQuantity(e.target.value)}
-            className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg"
-            required
-          />
-        </div>
-        <div>
-          <label
-            className="block text-sm font-medium text-gray-600"
-            htmlFor="image"
-          >
-            Imagem do produto*
-          </label>
-          <input
-            id="image"
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                setImageFile(e.target.files[0]);
-              }
-            }}
-            ref={fileInputRef}
-            className="mt-1 w-full"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-        >
-          Cadastrar produto
-        </button>
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem certeza que deseja excluir?")) return;
+    const res = await fetch(`/api/product/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setProducts((item) => item.filter((p) => p.id !== id));
+      router.refresh();
+    } else {
+      alert("erro");
+    }
+  };
 
-        {errorMsg && <div className="text-red-500 text-sm">{errorMsg}</div>}
-        {successMsg && (
-          <div className="text-green-600 text-sm">{successMsg}</div>
-        )}
-      </form>
+  return (
+    <div className="w-full max-w-screen-xl mx-auto mt-10 p-8 bg-white rounded-2xl shadow-lg space-y-8">
+      <section className="space-y-6">
+        <h2 className="text-3xl font-bold text-gray-900">Cadastrar Produto</h2>
+        <form
+          className="grid grid-cols-1 gap-4 md:grid-cols-2"
+          onSubmit={handleSubmit}
+        >
+          <div className="col-span-2">
+            <Label htmlFor="name">Nome*</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nome do produto"
+              required
+              className="mt-1"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <Label htmlFor="description">Descrição</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descreva o produto"
+              className="mt-1 h-24"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="price">Preço* (Ex: 39.90)</Label>
+            <Input
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="R$"
+              required
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="stockQuantity">Quantidade em Estoque*</Label>
+            <Input
+              id="stockQuantity"
+              type="number"
+              min="0"
+              value={stockQuantity}
+              onChange={(e) => setStockQuantity(e.target.value)}
+              placeholder="0"
+              required
+              className="mt-1"
+            />
+          </div>
+
+          <div className="col-span-2">
+            <Label htmlFor="image">Imagem do produto*</Label>
+            <Input
+              id="image"
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              className="mt-1"
+            />
+          </div>
+
+          <div className="col-span-2 text-right">
+            <Button
+              type="submit"
+              variant="default"
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Cadastrar
+            </Button>
+          </div>
+
+          {errorMsg && <p className="col-span-2 text-red-500">{errorMsg}</p>}
+          {successMsg && (
+            <p className="col-span-2 text-green-600">{successMsg}</p>
+          )}
+        </form>
+      </section>
+
+      <section>
+        <h3 className="text-2xl font-semibold mb-4">Produtos Cadastrados</h3>
+        <div className="overflow-x-auto">
+          <Table className="w-full table-fixed">
+            <TableHeader>
+              <TableRow className="bg-gray-100 sticky top-0">
+                <TableHead className="px-4 py-6 text-left text-sm font-semibold uppercase">
+                  Nome
+                </TableHead>
+                <TableHead className="px-4 py-6 text-left text-sm font-semibold uppercase">
+                  Descrição
+                </TableHead>
+                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
+                  Preço
+                </TableHead>
+                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
+                  Estoque
+                </TableHead>
+                <TableHead className="px-4 py-6 text-right text-sm font-semibold uppercase">
+                  Ações
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {products.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="py-6 text-center text-gray-500"
+                  >
+                    Nenhum produto cadastrado.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                products.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="px-4 py-6 text-sm font-medium text-gray-800">
+                      {item.name}
+                    </TableCell>
+                    <TableCell className="px-4 py-6 text-sm text-gray-600 truncate">
+                      {item.description || "-"}
+                    </TableCell>
+                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
+                      R$ {Number(item.price).toFixed(2)}
+                    </TableCell>
+                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
+                      {item.stockQuantity}
+                    </TableCell>
+                    <TableCell className="px-4 py-6 text-sm text-gray-800 text-right">
+                      <Button
+                        onClick={() => handleDelete(item.id)}
+                        variant="destructive"
+                        size="sm"
+                        className="px-3 py-1"
+                      >
+                        Excluir
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
     </div>
   );
 }
