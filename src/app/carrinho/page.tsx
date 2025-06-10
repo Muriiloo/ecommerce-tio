@@ -40,11 +40,13 @@ const CarrinhoPage = () => {
       });
 
       if (response.ok) {
-        alert("Pedido realizado com sucesso!");
         setSuccessMsg("Pedido realizado com sucesso!");
-        clearCart();
+        setTimeout(() => {
+          clearCart();
+          setSuccessMsg("");
+        }, 2000);
+        return;
       } else {
-        alert("Erro ao salvar pedido.");
         setErrorMsg("Erro ao gravar pedido.");
       }
     } catch (err) {
@@ -141,10 +143,12 @@ const CarrinhoPage = () => {
               Prosseguir com Pagamento
             </Button>
             {errorMsg && (
-              <div className="text-red-600 text-sm text-center">{errorMsg}</div>
+              <div className="text-red-600 text-sm text-center mt-4">
+                {errorMsg}
+              </div>
             )}
             {successMsg && (
-              <div className="text-green-600 text-sm text-center">
+              <div className="text-green-600 text-sm text-center mt-4">
                 {successMsg}
               </div>
             )}
