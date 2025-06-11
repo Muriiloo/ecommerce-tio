@@ -11,18 +11,53 @@ import {
   Shirt,
   Heart,
 } from "lucide-react";
+import Link from "next/link";
 
+type Props = {
+  searchParams: {
+    category?: string;
+  };
+};
 
+const ProdutosPage = async ({ searchParams }: Props) => {
+  const activeCategory = searchParams.category?.toLowerCase() as
+    | "feminino"
+    | "masculino"
+    | "infantil"
+    | "acessório"
+    | undefined;
 
-const ProdutosPage = async () => {
-  const products = await db.product.findMany({});
+  const products = await db.product.findMany({
+    where: activeCategory ? { category: activeCategory } : {},
+  });
+
   const transformedProducts = transformProducts(products);
 
   const categories = [
-    { name: "Feminino", count: 120, color: "from-pink-500 to-rose-600" },
-    { name: "Masculino", count: 80, color: "from-blue-500 to-indigo-600" },
-    { name: "Infantil", count: 45, color: "from-green-500 to-emerald-600" },
-    { name: "Acessórios", count: 35, color: "from-purple-500 to-violet-600" },
+    {
+      name: "Feminino",
+      key: "feminino",
+      count: 120,
+      color: "from-pink-500 to-rose-600",
+    },
+    {
+      name: "Masculino",
+      key: "masculino",
+      count: 80,
+      color: "from-blue-500 to-indigo-600",
+    },
+    {
+      name: "Infantil",
+      key: "infantil",
+      count: 45,
+      color: "from-green-500 to-emerald-600",
+    },
+    {
+      name: "Acessórios",
+      key: "acessório",
+      count: 35,
+      color: "from-purple-500 to-violet-600",
+    },
   ];
 
   return (
@@ -88,35 +123,77 @@ const ProdutosPage = async () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-            {categories.map((category, index) => (
+          {/* Filtro de categorias */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-16">
+            <Link href="/produtos" scroll={false}>
               <div
-                key={index}
-                className="group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+                className={`group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border ${
+                  !activeCategory
+                    ? "border-purple-500 ring-2 ring-purple-400"
+                    : "border-white/20"
+                } hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer`}
               >
-                <div
-                  className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                >
+                <div className="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <div className="w-full h-full flex items-center justify-center">
                     <Shirt className="w-6 h-6 text-white" />
                   </div>
                 </div>
-                <h3 className="font-bold text-gray-900 text-lg mb-1">
-                  {category.name}
+                <h3
+                  className={`font-bold text-lg mb-1 ${
+                    !activeCategory ? "text-purple-700" : "text-gray-900"
+                  }`}
+                >
+                  Todos
                 </h3>
-                <p className="text-gray-600 text-sm">
-                  {category.count} produtos
-                </p>
+                <p className="text-gray-600 text-sm">Exibir tudo</p>
               </div>
-            ))}
+            </Link>
+            {categories.map((category, index) => {
+              const isActive = activeCategory === category.key;
+
+              return (
+                <Link
+                  key={index}
+                  href={`?category=${category.key}`}
+                  scroll={false}
+                >
+                  <div
+                    className={`group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border ${
+                      isActive
+                        ? "border-purple-500 ring-2 ring-purple-400"
+                        : "border-white/20"
+                    } hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer`}
+                  >
+                    <div
+                      className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Shirt className="w-6 h-6 text-white" />
+                      </div>
+                    </div>
+                    <h3
+                      className={`font-bold text-lg mb-1 ${
+                        isActive ? "text-purple-700" : "text-gray-900"
+                      }`}
+                    >
+                      {category.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      {category.count} produtos
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </section>
 
+        {/* Lista de Produtos */}
         <section className="container mx-auto px-6 pb-20">
           <div className="bg-white/40 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl  font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
                   Produtos em Destaque
                 </h2>
                 <p className="text-gray-600">
@@ -135,15 +212,22 @@ const ProdutosPage = async () => {
             </div>
 
             <div className="relative bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {transformedProducts.map((produto) => (
-                  <ProductCard key={produto.id} product={produto} />
-                ))}
-              </div>
+              {transformedProducts.length === 0 ? (
+                <div className="text-center text-gray-500 text-lg">
+                  Nenhum produto encontrado.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {transformedProducts.map((produto) => (
+                    <ProductCard key={produto.id} product={produto} />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>
 
+        {/* Newsletter */}
         <section className="container mx-auto px-6 pb-20">
           <div className="bg-gradient-to-r from-purple-600/90 via-pink-600/90 to-rose-600/90 backdrop-blur-sm rounded-3xl p-12 text-center shadow-2xl border border-white/20">
             <div className="max-w-2xl mx-auto">

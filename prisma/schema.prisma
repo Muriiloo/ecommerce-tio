@@ -74,6 +74,14 @@ model Product {
   createdAt     DateTime       @default(now())
   orderItems    OrderItem[]
   images        ProductImage[]
+  category      Category
+}
+
+enum Category {
+  masculino
+  feminino
+  infantil
+  acessório
 }
 
 model Order {

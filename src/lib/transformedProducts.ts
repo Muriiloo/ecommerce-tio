@@ -1,6 +1,6 @@
 import { Product } from "@prisma/client";
 
-export const transformProducts = (products: Product[]) => {
+export const transformProducts = (products: Product[] = []) => {
   return products.map((product) => ({
     id: product.id,
     name: product.name,
