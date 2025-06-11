@@ -15,6 +15,7 @@ export const POST = async (request: Request) => {
     const description = formData.get("description")?.toString() || "";
     const price = Number(formData.get("price") || 0);
     const stockQuantity = Number(formData.get("stockQuantity") || 0);
+    const category = formData.get("category")?.toString() as "masculino" | "feminino" | "infantil" | "acessório";
 
     // 3) Pega o arquivo enviado (campo <input type="file" name="image" />)
     const imageFile = formData.get("image") as File | null;
@@ -50,6 +51,7 @@ export const POST = async (request: Request) => {
         price,
         stockQuantity,
         imageUrl,
+        category
       },
     });
 

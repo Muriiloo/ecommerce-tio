@@ -21,6 +21,7 @@ type Product = {
   description?: string;
   price: number;
   stockQuantity: number;
+  category: "masculino" | "feminino" | "infantil" | "acessório";
 };
 
 export default function CadastrarProduto() {
@@ -36,6 +37,7 @@ export default function CadastrarProduto() {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const [, setIsLoadingProducts] = useState(true);
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     async function validateUser() {
@@ -103,6 +105,7 @@ export default function CadastrarProduto() {
     formData.append("price", price);
     formData.append("stockQuantity", stockQuantity);
     formData.append("image", imageFile);
+    formData.append("category", category);
 
     try {
       const response = await fetch("/api/product", {
@@ -196,6 +199,21 @@ export default function CadastrarProduto() {
                 required
                 className="mt-1"
               />
+            </div>
+            <div>
+              <Label htmlFor="category">Categoria*</Label>
+              <select
+                id="category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="mt-1 block w-full border rounded-md p-2 text-gray-700"
+                required
+              >
+                <option value="masculino">Masculino</option>
+                <option value="feminino">Feminino</option>
+                <option value="infantil">Infantil</option>
+                <option value="acessório">Acessório</option>
+              </select>
             </div>
             <div className="col-span-2">
               <Label htmlFor="image">Imagem do produto*</Label>
