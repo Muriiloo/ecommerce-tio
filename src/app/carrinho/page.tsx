@@ -18,17 +18,24 @@ import { useState } from "react";
 const CarrinhoPage = () => {
   const { cart, removeFromCart, increaseQty, decreaseQty, clearCart } =
     useCart();
-
   const { user } = useAuth();
   const [paymentMethod, setPaymentMethod] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handlePayment = async () => {
+    if (!paymentMethod) {
+      setErrorMsg("Selecione uma forma de pagamento.");
+      return;
+    }
+
+    setErrorMsg("");
+    setLoading(true);
+
     try {
-      const response = await fetch("/api/order", {
+      const orderRes = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -39,19 +46,34 @@ const CarrinhoPage = () => {
         }),
       });
 
-      if (response.ok) {
-        setSuccessMsg("Pedido realizado com sucesso!");
-        setTimeout(() => {
-          clearCart();
-          setSuccessMsg("");
-        }, 2000);
-        return;
-      } else {
+      if (!orderRes.ok) {
         setErrorMsg("Erro ao gravar pedido.");
+        return;
       }
+
+      const { orderId } = await orderRes.json();
+
+      const checkoutRes = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId }),
+      });
+
+      if (!checkoutRes.ok) {
+        setErrorMsg("Erro ao iniciar o pagamento.");
+        return;
+      }
+
+      if (checkoutRes.ok) {
+        clearCart();
+      }
+
+      const { url } = await checkoutRes.json();
+      window.location.href = url;
     } catch (err) {
-      alert("Erro ao conectar com o server" + err);
-      setErrorMsg("Erro de servidor.");
+      setErrorMsg("Erro inesperado! Tente novamente." + err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,19 +159,21 @@ const CarrinhoPage = () => {
 
             <Button
               onClick={handlePayment}
+              disabled={!paymentMethod || loading}
               className="flex items-center justify-center gap-2 w-full mt-4 bg-gradient-to-r from-green-600 to-emerald-500 text-white py-3 rounded-xl shadow-md hover:brightness-110 transition-all font-semibold text-lg"
             >
-              <CreditCard size={20} />
-              Prosseguir com Pagamento
+              {loading ? (
+                "Aguarde…"
+              ) : (
+                <>
+                  <CreditCard size={20} />
+                  Prosseguir com Pagamento
+                </>
+              )}
             </Button>
             {errorMsg && (
               <div className="text-red-600 text-sm text-center mt-4">
                 {errorMsg}
-              </div>
-            )}
-            {successMsg && (
-              <div className="text-green-600 text-sm text-center mt-4">
-                {successMsg}
               </div>
             )}
           </div>
