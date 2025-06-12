@@ -1,19 +1,21 @@
 import { db } from "@/lib/prisma";
 
 export const getWeeklyRevenue = async () => {
-  const result = await db.$queryRaw<{ day: string; total: number }[]>`
-    SELECT 
+  await db.$executeRaw`SET lc_time_names = 'pt_BR';`;
+
+  const result = await db.$queryRaw<{ day: string; total: string }[]>`
+    SELECT
       DATE_FORMAT(createdAt, '%a %d/%m') AS day,
-      SUM(totalAmount) AS total
+      SUM(totalAmount)           AS total
     FROM \`Order\`
     WHERE status = 'pending'
       AND createdAt >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-    GROUP BY DATE(createdAt)
-    ORDER BY DATE(createdAt)
+    GROUP BY DATE_FORMAT(createdAt, '%a %d/%m')
+    ORDER BY MIN(createdAt)
   `;
 
   return result.map((r) => ({
-    ...r,
-    total: Number(r.total),
+    day: r.day,
+    total: Number(r.total).toFixed(2),
   }));
 };

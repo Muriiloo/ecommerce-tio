@@ -13,6 +13,6 @@ export const getMonthlyRevenue = async () => {
 
   return result.map((r) => ({
     ...r,
-    total: Number(r.total),
+    total: Number(r.total).toFixed(2),
   }));
 };

@@ -9,8 +9,11 @@ export const getDailyRevenue = async () => {
       AND DATE(createdAt) = CURDATE()
   `;
 
+  const now = new Date();
+  const formattedDate = now.toLocaleDateString("pt-BR"); // ex: "11/06/2025"
+
   return {
-    date: new Date().toISOString().split("T")[0],
-    total: Number(result[0]?.total || 0),
+    date: formattedDate,
+    total: Number(result[0]?.total || 0).toFixed(2),
   };
 };
