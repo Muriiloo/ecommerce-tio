@@ -12,7 +12,7 @@ import {
 
 type WeeklyData = {
   day: string;
-  total: number;
+  total: string;
 };
 
 interface WeeklyRevenueChartProps {

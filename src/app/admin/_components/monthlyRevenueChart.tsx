@@ -12,7 +12,7 @@ import {
 
 type Revenue = {
   month: string;
-  total: number;
+  total: string;
 };
 
 interface MonthlyRevenueChartProps {

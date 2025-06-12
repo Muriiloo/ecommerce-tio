@@ -12,7 +12,7 @@ import {
 
 interface DailyRevenue {
   date: string;
-  total: number;
+  total: string;
 }
 
 interface Props {

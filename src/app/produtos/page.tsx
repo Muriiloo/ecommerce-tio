@@ -20,7 +20,9 @@ type Props = {
 };
 
 const ProdutosPage = async ({ searchParams }: Props) => {
-  const activeCategory = searchParams.category?.toLowerCase() as
+  const { category } = await searchParams;
+
+  const activeCategory = category?.toLowerCase() as
     | "feminino"
     | "masculino"
     | "infantil"
