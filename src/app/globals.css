@@ -120,3 +120,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Customização das setas do Swiper Navigation */
+.swiper-button-prev,
+.swiper-button-next {
+  width: 36px !important;
+  height: 36px !important;
+  background-color: #9333ea !important; /* bg-purple-600 */
+  color: white !important;
+  border-radius: 9999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-size: 16px !important;
+  font-weight: bold;
+  color: white !important;
+}
+

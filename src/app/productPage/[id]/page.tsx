@@ -11,24 +11,27 @@ interface ProductPageProps {
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id: id },
-  });
+  const { id } = params;
+
+const product = await prisma.product.findUnique({
+  where: { id },
+  include: { images: true },
+});
 
   if (!product) return notFound();
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <ProductDetails
-        product={{
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          imageUrl: product.imageUrl,
-          price: Number(product.price),
-        }}
-      />
-    </div>
-  );
+  <div className="max-w-5xl mx-auto p-6">
+    <ProductDetails
+      product={{
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: Number(product.price),
+        imageUrl: product.imageUrl,
+        images: product.images.map((img) => img.imageUrl),
+      }}
+    />
+  </div>
+);
 }

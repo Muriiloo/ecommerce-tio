@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useCart } from "@/context/cartContext";
 import Image from "next/image";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 interface ProductDetailsProps {
   product: {
@@ -11,6 +15,7 @@ interface ProductDetailsProps {
     description: string;
     price: number;
     imageUrl: string;
+    images: string[];
   };
 }
 
@@ -39,13 +44,28 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
   return (
     <div className="flex flex-col md:flex-row gap-8">
-      <Image
-        src={product.imageUrl}
-        alt={product.name}
-        className="w-full md:w-1/2 rounded-xl object-cover"
-        width={1920}
-        height={1080}
-      />
+      <div className="w-full md:w-1/2">
+        <Swiper
+          spaceBetween={10}
+          slidesPerView={1}
+          navigation
+          modules={[Navigation]}
+          className="rounded-xl relative"
+        >
+          {[product.imageUrl, ...product.images].map((img, index) => (
+            <SwiperSlide key={index}>
+              <Image
+                src={img}
+                alt={`${product.name} - ${index + 1}`}
+                width={1920}
+                height={1080}
+                className="object-cover w-full h-auto rounded-xl"
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
+
       <div className="flex-1">
         <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
         <p className="text-gray-600 mb-4">{product.description}</p>
