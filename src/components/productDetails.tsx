@@ -66,7 +66,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         </Swiper>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 pl-4">
         <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
         <p className="text-gray-600 mb-4">{product.description}</p>
 
@@ -88,7 +88,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         </div>
 
         {/* Tamanhos */}
-        <div className="mb-6">
+        <div className="mb-3">
           <p className="font-semibold mb-2">Escolha o tamanho:</p>
           <div className="flex gap-2">
             {["P", "M", "G", "GG"].map((size) => (
@@ -107,7 +107,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </div>
         </div>
 
-        <p className="text-2xl font-semibold text-green-600 mb-6">
+        <p className="text-2xl font-semibold text-green-600 mb-2">
           R$ {product.price.toFixed(2)}
         </p>
 
