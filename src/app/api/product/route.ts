@@ -1,5 +1,3 @@
-// src/app/api/product/route.ts
-
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
@@ -7,62 +5,74 @@ import { db } from "@/lib/prisma";
 
 export const POST = async (request: Request) => {
   try {
-    // 1) Extrai o FormData inteiro
     const formData = await request.formData();
 
-    // 2) Pega os campos de texto
+    // Campos do formulário
     const name = formData.get("name")?.toString();
     const description = formData.get("description")?.toString() || "";
     const price = Number(formData.get("price") || 0);
     const stockQuantity = Number(formData.get("stockQuantity") || 0);
-    const category = formData.get("category")?.toString() as "masculino" | "feminino" | "infantil" | "acessório";
+    const category = formData.get("category")?.toString() as
+      | "masculino"
+      | "feminino"
+      | "infantil"
+      | "acessório";
 
-    // 3) Pega o arquivo enviado (campo <input type="file" name="image" />)
-    const imageFile = formData.get("image") as File | null;
-    if (!imageFile) {
+    // Verificações básicas
+    const files = formData.getAll("images") as File[];
+    if (!name || !price || !stockQuantity || files.length === 0) {
       return NextResponse.json(
-        { success: false, error: "Imagem não enviada." },
+        { success: false, error: "Campos obrigatórios ou imagens ausentes." },
         { status: 400 }
       );
     }
 
-    // 4) Converte o File (Web Blob) em Buffer para poder salvar no disco
-    const arrayBuffer = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // 5) Gera o diretório "public/uploads" (caso ainda não exista)
+    // Diretório de uploads
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     await fs.mkdir(uploadsDir, { recursive: true });
 
-    // 6) Cria um nome único para o arquivo (timestamp + nome original)
-    const safeFileName = `${Date.now()}_${path.basename(imageFile.name)}`;
-    const filePath = path.join(uploadsDir, safeFileName);
+    // Salva as imagens no disco e gera URLs
+    const imageUrls: string[] = [];
+    for (const file of files) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const safeFileName = `${Date.now()}_${path.basename(file.name)}`;
+      const filePath = path.join(uploadsDir, safeFileName);
+      await fs.writeFile(filePath, buffer);
+      imageUrls.push(`/uploads/${safeFileName}`);
+    }
 
-    // 7) Grava o arquivo no disco
-    await fs.writeFile(filePath, buffer);
+    // A primeira imagem será a imagem principal
+    const imageUrl = imageUrls[0];
 
-    // 8) Monta a URL pública que será salva no banco
-    const imageUrl = `/uploads/${safeFileName}`;
-
-    const created = await db.product.create({
+    // Criação do produto no banco de dados
+    const createdProduct = await db.product.create({
       data: {
-        name: name || "",
+        name,
         description,
         price,
         stockQuantity,
+        category,
         imageUrl,
-        category
+        images: {
+          create: imageUrls.map((url) => ({
+            imageUrl: url,
+          })),
+        },
+      },
+      include: {
+        images: true,
       },
     });
 
     return NextResponse.json(
-      { success: true, product: created },
+      { success: true, product: createdProduct },
       { status: 200 }
     );
   } catch (err) {
-    console.error("[Route POST /api/product] erro:", err);
+    console.error("[POST /api/product] Erro:", err);
     return NextResponse.json(
-      { success: false, error: "Erro ao processar formulário." },
+      { success: false, error: "Erro ao processar o produto." },
       { status: 500 }
     );
   }
@@ -70,7 +80,9 @@ export const POST = async (request: Request) => {
 
 export const GET = async () => {
   try {
-    const products = await db.product.findMany({});
+    const products = await db.product.findMany({
+      include: { images: true },
+    });
     return NextResponse.json({ products });
   } catch (err) {
     return NextResponse.json(

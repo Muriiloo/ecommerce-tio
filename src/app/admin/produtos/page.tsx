@@ -30,7 +30,7 @@ export default function CadastrarProduto() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,7 +94,7 @@ export default function CadastrarProduto() {
     setErrorMsg("");
     setSuccessMsg("");
 
-    if (!name || !price || !stockQuantity || !imageFile) {
+    if (!name || !price || !stockQuantity || imageFiles.length === 0) {
       setErrorMsg("Preencha todos os campos obrigatórios.");
       return;
     }
@@ -104,8 +104,10 @@ export default function CadastrarProduto() {
     formData.append("description", description);
     formData.append("price", price);
     formData.append("stockQuantity", stockQuantity);
-    formData.append("image", imageFile);
     formData.append("category", category);
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
 
     try {
       const response = await fetch("/api/product", {
@@ -121,7 +123,9 @@ export default function CadastrarProduto() {
         setDescription("");
         setPrice("");
         setStockQuantity("");
-        fileInputRef.current!.value = "";
+        setCategory("");
+        setImageFiles([]);
+        if (fileInputRef.current) fileInputRef.current.value = "";
         setTimeout(() => setSuccessMsg(""), 1500);
       } else {
         setErrorMsg(result.error || "Erro ao cadastrar produto.");
@@ -209,22 +213,36 @@ export default function CadastrarProduto() {
                 className="mt-1 block w-full border rounded-md p-2 text-gray-700"
                 required
               >
+                <option value="">Selecione</option>
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
                 <option value="infantil">Infantil</option>
                 <option value="acessório">Acessório</option>
               </select>
             </div>
-            <div className="col-span-2">
-              <Label htmlFor="image">Imagem do produto*</Label>
+            <div>
+              <Label>Imagens do produto*</Label>
               <Input
-                id="image"
                 type="file"
                 accept="image/*"
-                ref={fileInputRef}
-                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                 className="mt-1"
+                multiple
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files) {
+                    const filesArray = Array.from(files);
+                    setImageFiles((prev) => [...prev, ...filesArray]);
+                  }
+                }}
               />
+
+              {imageFiles.length > 0 && (
+                <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
+                  {imageFiles.map((file, index) => (
+                    <li key={index}>{file.name}</li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div className="col-span-2 text-right">
               <Button

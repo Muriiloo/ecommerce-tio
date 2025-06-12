@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     const { items, userId, paymentMethod, totalAmount } = await req.json();
 
-    if (!items || items.lenght === 0) {
+    if (!items || items.length === 0) {
       return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 });
     }
 
