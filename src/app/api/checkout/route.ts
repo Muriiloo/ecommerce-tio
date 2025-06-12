@@ -25,7 +25,7 @@ export const POST = async (req: Request) => {
         quantity: 1,
       },
     ],
-    success_url: `${process.env.NEXTAUTH_URL}`,
+    success_url: `${process.env.NEXTAUTH_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXTAUTH_URL}`,
     metadata: { orderId: order.id },
   });
