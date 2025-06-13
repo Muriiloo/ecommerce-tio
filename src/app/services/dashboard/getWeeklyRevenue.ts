@@ -8,7 +8,7 @@ export const getWeeklyRevenue = async () => {
       DATE_FORMAT(createdAt, '%a %d/%m') AS day,
       SUM(totalAmount)           AS total
     FROM \`Order\`
-    WHERE status = 'pending'
+    WHERE status = 'paid'
       AND createdAt >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
     GROUP BY DATE_FORMAT(createdAt, '%a %d/%m')
     ORDER BY MIN(createdAt)

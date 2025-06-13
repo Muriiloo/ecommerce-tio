@@ -8,7 +8,10 @@ export const getWeekRevenue = async () => {
     now.getFullYear(),
     now.getMonth(),
     now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1), // ajusta se for domingo
-    0, 0, 0, 0
+    0,
+    0,
+    0,
+    0
   );
 
   // Fim da semana (domingo às 23:59:59)
@@ -16,7 +19,10 @@ export const getWeekRevenue = async () => {
     startOfWeek.getFullYear(),
     startOfWeek.getMonth(),
     startOfWeek.getDate() + 6,
-    23, 59, 59, 999
+    23,
+    59,
+    59,
+    999
   );
 
   const result = await db.order.aggregate({
@@ -24,7 +30,7 @@ export const getWeekRevenue = async () => {
       totalAmount: true,
     },
     where: {
-      status: "pending", // ajustar depois para pagos
+      status: "paid", // ajustar depois para pagos
       createdAt: {
         gte: startOfWeek,
         lte: endOfWeek,

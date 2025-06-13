@@ -26,7 +26,7 @@ export const getTodayRevenue = async () => {
       totalAmount: true,
     },
     where: {
-      status: "pending", // ajustar depois para filtrar por pagos
+      status: "paid", // ajustar depois para filtrar por pagos
       createdAt: {
         gte: startOfDay,
         lte: endOfDay,

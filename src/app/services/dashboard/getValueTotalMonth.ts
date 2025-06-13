@@ -20,7 +20,7 @@ export const getValueTotalMonth = async () => {
       totalAmount: true,
     },
     where: {
-      status: "pending", // ajustar depois para filtrar por pagos
+      status: "paid", // ajustar depois para filtrar por pagos
       createdAt: {
         gte: startOfMonth,
         lte: endOfMonth,
