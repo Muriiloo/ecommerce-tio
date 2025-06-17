@@ -12,7 +12,6 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-
   const product = await prisma.product.findUnique({
     where: { id },
     include: { images: true },

@@ -117,9 +117,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   key={color}
                   onClick={() => setSelectedColor(color)}
                   className={`w-10 h-10 rounded-full border-2 ${
-                    selectedColor === color
-                      ? "border-black"
-                      : "border-gray-300"
+                    selectedColor === color ? "border-black" : "border-gray-300"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -161,11 +159,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div className="space-y-12">
         <div>
           <h2 className="text-xl font-semibold mb-4 italic">Descrição Longa</h2>
-          <p className="text-gray-700 whitespace-pre-line">{product.description}</p>
+          <p className="text-gray-700 whitespace-pre-line">
+            {product.description}
+          </p>
         </div>
         <div>
-          <h2 className="text-xl font-semibold mb-4 italic">Detalhes do Produto</h2>
-          <div className="text-gray-700 whitespace-pre-line">{product.details}</div>
+          <h2 className="text-xl font-semibold mb-4 italic">
+            Detalhes do Produto
+          </h2>
+          <div className="text-gray-700 whitespace-pre-line">
+            {product.details}
+          </div>
         </div>
       </div>
 
@@ -180,15 +184,18 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </tr>
           </thead>
           <tbody>
-            {[["P", "68", "50"], ["M", "70", "52"], ["G", "72", "54"], ["GG", "74", "56"]].map(
-              ([size, height, width]) => (
-                <tr key={size}>
-                  <td className="border px-4 py-2">{size}</td>
-                  <td className="border px-4 py-2">{height}</td>
-                  <td className="border px-4 py-2">{width}</td>
-                </tr>
-              )
-            )}
+            {[
+              ["P", "68", "50"],
+              ["M", "70", "52"],
+              ["G", "72", "54"],
+              ["GG", "74", "56"],
+            ].map(([size, height, width]) => (
+              <tr key={size}>
+                <td className="border px-4 py-2">{size}</td>
+                <td className="border px-4 py-2">{height}</td>
+                <td className="border px-4 py-2">{width}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -196,26 +203,38 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
         <div className="space-y-4">
-          {[{ name: "João S.", rating: "⭐⭐⭐⭐⭐", comment: "Muito boa! Chegou antes do prazo e a qualidade é ótima." },
-            { name: "Ana P.", rating: "⭐⭐⭐⭐", comment: "Gostei bastante, mas achei a modelagem um pouco grande." }].map(
-            (review, idx) => (
-              <div key={idx} className="border rounded-lg p-4">
-                <p className="font-semibold">{review.name}</p>
-                <p>{review.rating}</p>
-                <p>{review.comment}</p>
-              </div>
-            )
-          )}
+          {[
+            {
+              name: "João S.",
+              rating: "⭐⭐⭐⭐⭐",
+              comment:
+                "Muito boa! Chegou antes do prazo e a qualidade é ótima.",
+            },
+            {
+              name: "Ana P.",
+              rating: "⭐⭐⭐⭐",
+              comment:
+                "Gostei bastante, mas achei a modelagem um pouco grande.",
+            },
+          ].map((review, idx) => (
+            <div key={idx} className="border rounded-lg p-4">
+              <p className="font-semibold">{review.name}</p>
+              <p>{review.rating}</p>
+              <p>{review.comment}</p>
+            </div>
+          ))}
         </div>
       </div>
 
       <div>
         <h2 className="text-2xl font-semibold mb-4">Produtos Relacionados</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[{ name: "Camiseta Branca", image: "/camiseta-branca.jpg" },
+          {[
+            { name: "Camiseta Branca", image: "/camiseta-branca.jpg" },
             { name: "Camiseta Preta", image: "/camiseta-preta.jpg" },
             { name: "Camiseta Bege", image: "/camiseta-bege.jpg" },
-            { name: "Camiseta Verde", image: "/camiseta-verde.jpg" }].map((item) => (
+            { name: "Camiseta Verde", image: "/camiseta-verde.jpg" },
+          ].map((item) => (
             <div key={item.name} className="border rounded-lg overflow-hidden">
               <Image
                 src={item.image}
@@ -235,9 +254,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Garantia e Entrega</h2>
         <p className="text-gray-700">
-          ✔ Entrega garantida em todo o Brasil.<br />
-          ✔ Você pode solicitar troca ou devolução em até 7 dias após o recebimento.<br />
-          ✔ Produto com garantia contra defeitos de fabricação.
+          ✔ Entrega garantida em todo o Brasil.
+          <br />
+          ✔ Você pode solicitar troca ou devolução em até 7 dias após o
+          recebimento.
+          <br />✔ Produto com garantia contra defeitos de fabricação.
         </p>
       </div>
     </div>
