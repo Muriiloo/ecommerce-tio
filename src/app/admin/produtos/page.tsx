@@ -19,6 +19,7 @@ type Product = {
   id: string;
   name: string;
   description?: string;
+  details?: string;
   price: number;
   stockQuantity: number;
   category: "masculino" | "feminino" | "infantil" | "acessório";
@@ -28,6 +29,7 @@ export default function CadastrarProduto() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [details, setDetails] = useState("");
   const [price, setPrice] = useState("");
   const [stockQuantity, setStockQuantity] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -102,6 +104,7 @@ export default function CadastrarProduto() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
+    formData.append("details", details);
     formData.append("price", price);
     formData.append("stockQuantity", stockQuantity);
     formData.append("category", category);
@@ -121,6 +124,7 @@ export default function CadastrarProduto() {
         setProducts((prev) => [...prev, result.product]);
         setName("");
         setDescription("");
+        setDetails("");
         setPrice("");
         setStockQuantity("");
         setCategory("");
@@ -149,9 +153,7 @@ export default function CadastrarProduto() {
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-screen-xl mx-auto bg-white rounded-lg shadow overflow-hidden">
         <section className="p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Cadastrar Produto
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900">Cadastrar Produto</h2>
           <form
             className="grid grid-cols-1 gap-4 md:grid-cols-2"
             onSubmit={handleSubmit}
@@ -174,6 +176,16 @@ export default function CadastrarProduto() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descreva o produto"
+                className="mt-1 h-24"
+              />
+            </div>
+            <div className="col-span-2">
+              <Label htmlFor="details">Detalhes do Produto</Label>
+              <Textarea
+                id="details"
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                placeholder="Ex: 100% algodão, feito no Brasil, lavagem a seco..."
                 className="mt-1 h-24"
               />
             </div>
@@ -227,6 +239,7 @@ export default function CadastrarProduto() {
                 accept="image/*"
                 className="mt-1"
                 multiple
+                ref={fileInputRef}
                 onChange={(e) => {
                   const files = e.target.files;
                   if (files) {
@@ -235,7 +248,6 @@ export default function CadastrarProduto() {
                   }
                 }}
               />
-
               {imageFiles.length > 0 && (
                 <ul className="mt-2 text-sm text-gray-600 list-disc list-inside">
                   {imageFiles.map((file, index) => (

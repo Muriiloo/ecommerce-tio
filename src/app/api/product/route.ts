@@ -10,6 +10,7 @@ export const POST = async (request: Request) => {
     // Campos do formulário
     const name = formData.get("name")?.toString();
     const description = formData.get("description")?.toString() || "";
+    const details = formData.get("details")?.toString() || "";
     const price = Number(formData.get("price") || 0);
     const stockQuantity = Number(formData.get("stockQuantity") || 0);
     const category = formData.get("category")?.toString() as
@@ -53,6 +54,7 @@ export const POST = async (request: Request) => {
         price,
         stockQuantity,
         category,
+        details,
         imageUrl,
         images: {
           create: imageUrls.map((url) => ({
