@@ -14,7 +14,7 @@ interface ProductCardProps {
     image: string | null;
     description: string;
     price: number;
-    stockQuantity: number; // ✅ necessário para badge
+    stockQuantity: number;
   };
 }
 
@@ -24,11 +24,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const isLowStock = product.stockQuantity < 5;
 
-  return (
-    <Card className="group relative overflow-hidden rounded-2xl shadow-lg border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.025] hover:shadow-2xl">
-      <CardContent className="p-0">
-        <div className="relative h-56 bg-gradient-to-br from-blue-100 via-white to-gray-100 flex items-center justify-center">
+  const handleCardClick = () => {
+    router.push(`/productPage/${product.id}`);
+  };
 
+  return (
+    <Card
+      onClick={handleCardClick}
+      className="group relative overflow-hidden rounded-2xl shadow-lg border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.025] hover:shadow-2xl cursor-pointer"
+    >
+      <CardContent className="p-0">
+        <div className="relative h-90 bg-gradient-to-br from-blue-100 via-white to-gray-100 flex items-center justify-center">
           {/* Imagem */}
           <div className="absolute inset-0 flex items-center justify-center">
             {product.image ? (
@@ -48,7 +54,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             NOVO
           </span>
 
-          {/* ✅ Badge de ESTOQUE BAIXO */}
+          {/* Badge de ESTOQUE BAIXO */}
           {isLowStock && (
             <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow animate-pulse">
               Últimas {product.stockQuantity} unidades!
@@ -57,42 +63,44 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
 
         <div className="p-6">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-2xl font-bold text-gray-800 group-hover:text-blue-700 transition">
-              {product.name}
-            </h3>
-            <button
-              onClick={() =>
-                addToCart({
-                  id: product.id,
-                  productId: product.id,
-                  name: product.name,
-                  price: product.price,
-                  quantity: 1,
-                  image: product.image,
-                })
-              }
-              className="rounded-full bg-blue-50 p-2 shadow hover:bg-blue-600 hover:text-white transition-colors"
-              title="Adicionar ao carrinho"
-            >
-              <ShoppingCart className="w-6 h-6" />
-            </button>
-          </div>
+          <h3 className="text-lg font-bold text-gray-800">
+            {product.name}
+          </h3>
 
-          <p className="text-gray-500 mb-6 min-h-[48px]">
-            {product.description}
-          </p>
-
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-extrabold text-green-600 drop-shadow">
+          <div className="flex flex-col gap-4 mt-6">
+            <span className="text-lg font-semibold text-red-700 drop-shadow">
               R$ {product.price.toFixed(2)}
             </span>
-            <Button
-              onClick={() => router.push(`/productPage/${product.id}`)}
-              className="bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500 text-white px-6 py-2 rounded-xl font-semibold shadow transition-all"
-            >
-              Ver Detalhes
-            </Button>
+
+            <div className="flex items-center justify-between gap-4 mt-4">
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/productPage/${product.id}`);
+                }}
+                className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-semibold w-[75%]"
+              >
+                Ver detalhes
+              </Button>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  addToCart({
+                    id: product.id,
+                    productId: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    image: product.image,
+                  });
+                }}
+                className="bg-black text-white p-2 rounded hover:bg-gray-800 transition w-full items-center justify-center flex"
+                title="Adicionar ao carrinho"
+              >
+                <ShoppingCart className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
 
