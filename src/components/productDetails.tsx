@@ -1,16 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/context/cartContext";
 import Image from "next/image";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode, Thumbs } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
-
 import type { Swiper as SwiperClass } from "swiper";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ProductFreteCalculator from "@/components/freteCalculator";
 
 interface ProductDetailsProps {
@@ -30,6 +32,18 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<ProductDetailsProps["product"][]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      const res = await fetch(`/api/related-products?id=${product.id}`);
+      const data = await res.json();
+      setRelatedProducts(data);
+    };
+
+    fetchRelatedProducts();
+  }, [product.id]);
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
@@ -52,6 +66,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col md:flex-row gap-8">
+        {/* Carrossel de imagens */}
         <div className="w-full md:w-1/2">
           <Swiper
             style={
@@ -102,6 +117,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
           </Swiper>
         </div>
 
+        {/* Detalhes e seleção */}
         <div className="flex-1">
           <h1 className="text-3xl font-bold mb-6">{product.name}</h1>
 
@@ -117,9 +133,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   key={color}
                   onClick={() => setSelectedColor(color)}
                   className={`w-10 h-10 rounded-full border-2 ${
-                    selectedColor === color
-                      ? "border-black"
-                      : "border-gray-300"
+                    selectedColor === color ? "border-black" : "border-gray-300"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -129,20 +143,74 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
           <div className="mb-6">
             <p className="font-semibold mb-3">Escolha o tamanho:</p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center flex-wrap">
               {["P", "M", "G", "GG"].map((size) => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   className={`px-4 py-2 rounded border ${
-                    selectedSize === size
-                      ? "bg-black text-white"
-                      : "border-gray-300"
+                    selectedSize === size ? "bg-black text-white" : "border-gray-300"
                   }`}
                 >
                   {size}
                 </button>
               ))}
+
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <button className="ml-2 text-sm text-purple-700 underline hover:text-purple-900">
+                    Tabela de Medidas
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="w-full max-w-2xl p-4 sm:rounded-lg sm:p-6 relative">
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-black"
+                    aria-label="Fechar"
+                  >
+                    ✕
+                  </button>
+                  <DialogHeader>
+                    <DialogTitle className="text-lg sm:text-2xl">Tabela de Medidas</DialogTitle>
+                  </DialogHeader>
+
+                  <div className="mb-4 flex justify-center">
+                    <Image
+                      src="/tabela-medidas.png"
+                      alt="Tabela de medidas"
+                      width={400}
+                      height={300}
+                      className="rounded-md border"
+                    />
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-300 text-sm sm:text-base">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border px-4 py-2">Tamanho</th>
+                          <th className="border px-4 py-2">Altura (cm)</th>
+                          <th className="border px-4 py-2">Largura (cm)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          ["P", "68", "50"],
+                          ["M", "70", "52"],
+                          ["G", "72", "54"],
+                          ["GG", "74", "56"],
+                        ].map(([size, altura, largura]) => (
+                          <tr key={size}>
+                            <td className="border px-4 py-2 text-center">{size}</td>
+                            <td className="border px-4 py-2 text-center">{altura}</td>
+                            <td className="border px-4 py-2 text-center">{largura}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
 
@@ -153,11 +221,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             Adicionar à Sacola
           </button>
 
-          {/* Novo componente de cálculo de frete */}
           <ProductFreteCalculator />
         </div>
       </div>
 
+      {/* Descrição e detalhes */}
       <div className="space-y-12">
         <div>
           <h2 className="text-xl font-semibold mb-4 italic">Descrição Longa</h2>
@@ -169,30 +237,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         </div>
       </div>
 
-      <div>
-        <h2 className="text-2xl font-semibold mb-4">Tabela de Medidas</h2>
-        <table className="w-full border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">Tamanho</th>
-              <th className="border px-4 py-2">Altura (cm)</th>
-              <th className="border px-4 py-2">Largura (cm)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[["P", "68", "50"], ["M", "70", "52"], ["G", "72", "54"], ["GG", "74", "56"]].map(
-              ([size, height, width]) => (
-                <tr key={size}>
-                  <td className="border px-4 py-2">{size}</td>
-                  <td className="border px-4 py-2">{height}</td>
-                  <td className="border px-4 py-2">{width}</td>
-                </tr>
-              )
-            )}
-          </tbody>
-        </table>
-      </div>
-
+      {/* Avaliações */}
       <div>
         <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
         <div className="space-y-4">
@@ -209,29 +254,36 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         </div>
       </div>
 
+      {/* Produtos relacionados */}
       <div>
         <h2 className="text-2xl font-semibold mb-4">Produtos Relacionados</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[{ name: "Camiseta Branca", image: "/camiseta-branca.jpg" },
-            { name: "Camiseta Preta", image: "/camiseta-preta.jpg" },
-            { name: "Camiseta Bege", image: "/camiseta-bege.jpg" },
-            { name: "Camiseta Verde", image: "/camiseta-verde.jpg" }].map((item) => (
-            <div key={item.name} className="border rounded-lg overflow-hidden">
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={500}
-                height={500}
-                className="object-cover w-full"
-              />
-              <div className="p-2">
-                <p className="font-semibold">{item.name}</p>
-              </div>
-            </div>
-          ))}
+          {relatedProducts.length > 0 ? (
+            relatedProducts.map((item) => (
+              <Link
+                key={item.id}
+                href={`/produto/${item.id}`}
+                className="border rounded-lg overflow-hidden block"
+              >
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  width={500}
+                  height={500}
+                  className="object-cover w-full"
+                />
+                <div className="p-2">
+                  <p className="font-semibold">{item.name}</p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <p className="text-gray-600">Nenhum produto relacionado encontrado.</p>
+          )}
         </div>
       </div>
 
+      {/* Garantia */}
       <div>
         <h2 className="text-2xl font-semibold mb-4">Garantia e Entrega</h2>
         <p className="text-gray-700">
