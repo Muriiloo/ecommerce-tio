@@ -66,10 +66,11 @@ model Product {
   id            String         @id @default(uuid())
   name          String
   description   String
+  details       String?
   price         Decimal        @db.Decimal(10, 2)
   stockQuantity Int
-  size           String?  
-  color          String?  
+  size          String?
+  color         String?
   imageUrl      String
   createdAt     DateTime       @default(now())
   orderItems    OrderItem[]

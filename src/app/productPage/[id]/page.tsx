@@ -21,7 +21,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) return notFound();
 
   return (
-    <div className="max-w-5xl mx-auto p-6 mt-6">
+    <div className="max-w-7xl mx-auto p-6 mt-6">
       <ProductDetails
         product={{
           id: product.id,
@@ -30,6 +30,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           price: Number(product.price),
           imageUrl: product.imageUrl,
           images: product.images.map((img) => img.imageUrl),
+          details: product.details || "",
         }}
       />
     </div>
