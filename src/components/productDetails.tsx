@@ -19,6 +19,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import ProductFreteCalculator from "@/components/freteCalculator";
+import { Button } from "./ui/button";
 
 interface ProductDetailsProps {
   product: {
@@ -43,6 +44,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     ProductDetailsProps["product"][]
   >([]);
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -56,7 +58,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
-      alert("Por favor, selecione o tamanho e a cor.");
+      setError("Por favor, selecione o tamanho e a cor.");
       return;
     }
 
@@ -70,6 +72,8 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       selectedSize,
       selectedColor,
     });
+
+    setError("");
   };
 
   return (
@@ -233,14 +237,19 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </div>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition mb-6"
-          >
-            Adicionar à Sacola
-          </button>
+          <div>
+            <Button
+              onClick={handleAddToCart}
+              className="text-sm font-medium px-4 py-2 bg-gradient-to-r from-green-500 to-teal-400 "
+            >
+              <span className="p-4">Adicionar à Sacola</span>
+            </Button>
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+          </div>
 
-          <ProductFreteCalculator />
+          <div className="mt-6">
+            <ProductFreteCalculator />
+          </div>
         </div>
       </div>
 
