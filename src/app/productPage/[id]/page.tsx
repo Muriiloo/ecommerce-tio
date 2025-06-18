@@ -33,7 +33,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           images: product.images.map((img) => img.imageUrl),
           details: product.details || "",
           stockQuantity: product.stockQuantity,
-          
         }}
       />
     </div>
