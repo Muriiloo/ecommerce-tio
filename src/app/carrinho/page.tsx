@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/context/authContext";
 import { useCart } from "@/context/cartContext";
 import { CreditCard } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 const CarrinhoPage = () => {
@@ -47,10 +48,12 @@ const CarrinhoPage = () => {
       });
 
       if (!orderRes.ok) {
-        setErrorMsg("Erro ao gravar pedido.");
-        return;
+        const errorData = await orderRes.json();
+        if (errorData.error) {
+          setErrorMsg(errorData.error);
+          return;
+        }
       }
-
       const { orderId } = await orderRes.json();
 
       const checkoutRes = await fetch("/api/checkout", {
@@ -92,7 +95,9 @@ const CarrinhoPage = () => {
                 className="flex justify-between items-center border-b pb-4"
               >
                 <div>
-                  <h2 className="font-semibold">{item.name}</h2>
+                  <Link href={`/productPage/${item.id}`} className="block">
+                    <h2 className="font-semibold">{item.name}</h2>
+                  </Link>
                   <p className="text-sm text-gray-600">
                     {item.quantity}x R${item.price.toFixed(2)}
                   </p>

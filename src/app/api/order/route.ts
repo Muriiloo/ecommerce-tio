@@ -10,6 +10,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Carrinho vazio." }, { status: 400 });
     }
 
+    for (const item of items) {
+      if (!item.selectedSize || item.selectedSize.trim() === "") {
+        return NextResponse.json(
+          { error: "Tamanho deve ser selecionado." },
+          { status: 400 }
+        );
+      }
+      if (item.selectedColor.trim() === "" || !item.selectedColor) {
+        return NextResponse.json(
+          { error: "Cor deve ser selecionada." },
+          { status: 400 }
+        );
+      }
+    }
+
     if (!userId) {
       return NextResponse.json(
         { error: "Usuário não autenticado." },
