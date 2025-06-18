@@ -3,27 +3,34 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/cartContext";
 import Image from "next/image";
-import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode, Thumbs } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
+import ProductCard from "@/components/productCard";
 import type { Swiper as SwiperClass } from "swiper";
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import ProductFreteCalculator from "@/components/freteCalculator";
 
 interface ProductDetailsProps {
   product: {
     id: string;
     name: string;
+    image: string | null;
     description: string;
     price: number;
     imageUrl: string;
     images: string[];
     details: string;
+    stockQuantity: number;
   };
 }
 
@@ -32,7 +39,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<ProductDetailsProps["product"][]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<
+    ProductDetailsProps["product"][]
+  >([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -149,7 +158,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   key={size}
                   onClick={() => setSelectedSize(size)}
                   className={`px-4 py-2 rounded border ${
-                    selectedSize === size ? "bg-black text-white" : "border-gray-300"
+                    selectedSize === size
+                      ? "bg-black text-white"
+                      : "border-gray-300"
                   }`}
                 >
                   {size}
@@ -171,7 +182,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                     ✕
                   </button>
                   <DialogHeader>
-                    <DialogTitle className="text-lg sm:text-2xl">Tabela de Medidas</DialogTitle>
+                    <DialogTitle className="text-lg sm:text-2xl">
+                      Tabela de Medidas
+                    </DialogTitle>
                   </DialogHeader>
 
                   <div className="mb-4 flex justify-center">
@@ -201,9 +214,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                           ["GG", "74", "56"],
                         ].map(([size, altura, largura]) => (
                           <tr key={size}>
-                            <td className="border px-4 py-2 text-center">{size}</td>
-                            <td className="border px-4 py-2 text-center">{altura}</td>
-                            <td className="border px-4 py-2 text-center">{largura}</td>
+                            <td className="border px-4 py-2 text-center">
+                              {size}
+                            </td>
+                            <td className="border px-4 py-2 text-center">
+                              {altura}
+                            </td>
+                            <td className="border px-4 py-2 text-center">
+                              {largura}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -229,11 +248,17 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div className="space-y-12">
         <div>
           <h2 className="text-xl font-semibold mb-4 italic">Descrição Longa</h2>
-          <p className="text-gray-700 whitespace-pre-line">{product.description}</p>
+          <p className="text-gray-700 whitespace-pre-line">
+            {product.description}
+          </p>
         </div>
         <div>
-          <h2 className="text-xl font-semibold mb-4 italic">Detalhes do Produto</h2>
-          <div className="text-gray-700 whitespace-pre-line">{product.details}</div>
+          <h2 className="text-xl font-semibold mb-4 italic">
+            Detalhes do Produto
+          </h2>
+          <div className="text-gray-700 whitespace-pre-line">
+            {product.details}
+          </div>
         </div>
       </div>
 
@@ -241,16 +266,26 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
         <div className="space-y-4">
-          {[{ name: "João S.", rating: "⭐⭐⭐⭐⭐", comment: "Muito boa! Chegou antes do prazo e a qualidade é ótima." },
-            { name: "Ana P.", rating: "⭐⭐⭐⭐", comment: "Gostei bastante, mas achei a modelagem um pouco grande." }].map(
-            (review, idx) => (
-              <div key={idx} className="border rounded-lg p-4">
-                <p className="font-semibold">{review.name}</p>
-                <p>{review.rating}</p>
-                <p>{review.comment}</p>
-              </div>
-            )
-          )}
+          {[
+            {
+              name: "João S.",
+              rating: "⭐⭐⭐⭐⭐",
+              comment:
+                "Muito boa! Chegou antes do prazo e a qualidade é ótima.",
+            },
+            {
+              name: "Ana P.",
+              rating: "⭐⭐⭐⭐",
+              comment:
+                "Gostei bastante, mas achei a modelagem um pouco grande.",
+            },
+          ].map((review, idx) => (
+            <div key={idx} className="border rounded-lg p-4">
+              <p className="font-semibold">{review.name}</p>
+              <p>{review.rating}</p>
+              <p>{review.comment}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -260,25 +295,12 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {relatedProducts.length > 0 ? (
             relatedProducts.map((item) => (
-              <Link
-                key={item.id}
-                href={`/produto/${item.id}`}
-                className="border rounded-lg overflow-hidden block"
-              >
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  width={500}
-                  height={500}
-                  className="object-cover w-full"
-                />
-                <div className="p-2">
-                  <p className="font-semibold">{item.name}</p>
-                </div>
-              </Link>
+              <ProductCard key={item.id} product={item} />
             ))
           ) : (
-            <p className="text-gray-600">Nenhum produto relacionado encontrado.</p>
+            <p className="text-gray-600">
+              Nenhum produto relacionado encontrado.
+            </p>
           )}
         </div>
       </div>
@@ -287,9 +309,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Garantia e Entrega</h2>
         <p className="text-gray-700">
-          ✔ Entrega garantida em todo o Brasil.<br />
-          ✔ Você pode solicitar troca ou devolução em até 7 dias após o recebimento.<br />
-          ✔ Produto com garantia contra defeitos de fabricação.
+          ✔ Entrega garantida em todo o Brasil.
+          <br />
+          ✔ Você pode solicitar troca ou devolução em até 7 dias após o
+          recebimento.
+          <br />✔ Produto com garantia contra defeitos de fabricação.
         </p>
       </div>
     </div>

@@ -26,11 +26,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
         product={{
           id: product.id,
           name: product.name,
+          image: product.imageUrl,
           description: product.description,
           price: Number(product.price),
           imageUrl: product.imageUrl,
           images: product.images.map((img) => img.imageUrl),
           details: product.details || "",
+          stockQuantity: product.stockQuantity,
+          
         }}
       />
     </div>

@@ -1,5 +1,6 @@
 import { db } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { transformProducts } from "@/lib/transformedProducts";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,5 +17,7 @@ export async function GET(request: Request) {
     take: 4,
   });
 
-  return NextResponse.json(related);
+  const transformed = transformProducts(related);
+
+  return NextResponse.json(transformed);
 }

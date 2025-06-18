@@ -19,6 +19,7 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  console.log("Imagem do produto:", product.image);
   const { addToCart } = useCart();
   const router = useRouter();
 
@@ -69,7 +70,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
           <div className="flex flex-col gap-4 mt-6">
             <span className="text-lg font-semibold text-red-700 drop-shadow">
-              R$ {product.price.toFixed(2)}
+              R$ {Number(product.price).toFixed(2)}
             </span>
 
             <div className="flex items-center justify-between gap-4 mt-4">
@@ -78,7 +79,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                   e.stopPropagation();
                   router.push(`/productPage/${product.id}`);
                 }}
-                className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-semibold w-[75%]"
+                className="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded font-semibold w-[75%] cursor-pointer"
               >
                 Ver detalhes
               </Button>
@@ -95,7 +96,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     image: product.image,
                   });
                 }}
-                className="bg-black text-white p-2 rounded hover:bg-gray-800 transition w-full items-center justify-center flex"
+                className="bg-black text-white p-2 rounded hover:bg-gray-800 transition w-full items-center justify-center flex cursor-pointer"
                 title="Adicionar ao carrinho"
               >
                 <ShoppingCart className="w-5 h-5" />
