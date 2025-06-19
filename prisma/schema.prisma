@@ -18,10 +18,19 @@ model User {
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt @default(now())
 
+  // Endereço principal do usuário
+  street        String?
+  number        String?
+  complement    String?
+  neighborhood  String?
+  city          String?
+  state         String?
+  zipCode       String?
+  phone         String?
  
   accounts      Account[]
   sessions      Session[]
-
+  addresses     Address[]  // Múltiplos endereços
   
   orders        Order[]
 }
@@ -62,6 +71,24 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Address {
+  id           String  @id @default(uuid())
+  userId       String
+  name         String  // "Casa", "Trabalho", etc.
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  zipCode      String
+  isDefault    Boolean @default(false)
+  createdAt    DateTime @default(now())
+  
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders       Order[]
+}
+
 model Product {
   id            String         @id @default(uuid())
   name          String
@@ -88,11 +115,24 @@ enum Category {
 model Order {
   id            String      @id @default(uuid())
   userId        String
-  user          User        @relation(fields: [userId], references: [id])
+  addressId     String?     // Endereço usado no pedido
   status        OrderStatus
   totalAmount   Decimal     @db.Decimal(10, 2)
   paymentMethod String
   createdAt     DateTime    @default(now())
+  
+  // Snapshot do endereço no momento do pedido (para preservar histórico)
+  deliveryStreet       String?
+  deliveryNumber       String?
+  deliveryComplement   String?
+  deliveryNeighborhood String?
+  deliveryCity         String?
+  deliveryState        String?
+  deliveryZipCode      String?
+  deliveryPhone        String?
+  
+  user          User        @relation(fields: [userId], references: [id])
+  address       Address?    @relation(fields: [addressId], references: [id])
   items         OrderItem[]
 }
 
