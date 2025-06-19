@@ -4,7 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { items, userId, paymentMethod, totalAmount } = await req.json();
+    const { items, userId, paymentMethod, totalAmount, address } =
+      await req.json();
 
     if (!items || items.length === 0) {
       return NextResponse.json({ message: "Carrinho vazio." }, { status: 400 });
@@ -66,6 +67,15 @@ export async function POST(req: NextRequest) {
           status: "pending",
           totalAmount,
           paymentMethod,
+          // Salvar snapshot do endereço
+          deliveryStreet: address?.street,
+          deliveryNumber: address?.number,
+          deliveryComplement: address?.complement,
+          deliveryNeighborhood: address?.neighborhood,
+          deliveryCity: address?.city,
+          deliveryState: address?.state,
+          deliveryZipCode: address?.zipCode,
+          deliveryPhone: address?.phone,
         },
       });
 

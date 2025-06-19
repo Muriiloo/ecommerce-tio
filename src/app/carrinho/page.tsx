@@ -12,6 +12,20 @@ import {
 } from "@/components/ui/select";
 import { useAuth } from "@/context/authContext";
 import { useCart } from "@/context/cartContext";
+import AddressManager from "@/components/AddressManager";
+
+interface Address {
+  id: string;
+  name: string;
+  street: string;
+  number: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  isDefault: boolean;
+}
 import { CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -23,12 +37,17 @@ const CarrinhoPage = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
   const handlePayment = async () => {
     if (!paymentMethod) {
       setErrorMsg("Selecione uma forma de pagamento.");
+      return;
+    }
+
+    if (!selectedAddress) {
+      setErrorMsg("Selecione um endereço de entrega.");
       return;
     }
 
@@ -44,6 +63,7 @@ const CarrinhoPage = () => {
           totalAmount: total,
           paymentMethod,
           items: cart,
+          address: selectedAddress,
         }),
       });
 
@@ -133,9 +153,17 @@ const CarrinhoPage = () => {
                   Remover
                 </button>
               </li>
-            ))}
-          </ul>
-
+            ))}{" "}
+          </ul>{" "}
+          {user?.id && (
+            <div className="mt-6">
+              <AddressManager
+                userId={user.id}
+                selectedAddress={selectedAddress}
+                onAddressSelect={setSelectedAddress}
+              />
+            </div>
+          )}
           <div className="mt-6">
             <div className="flex justify-between">
               <p className="text-xl font-bold">Total: R${total.toFixed(2)}</p>
