@@ -75,7 +75,6 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
       city,
       state,
       zipCode,
-      isAdmin,
     } = await req.json();
 
     if (!name || !email) {
@@ -98,7 +97,6 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
         city: city || null,
         state: state || null,
         zipCode: zipCode || null,
-        isAdmin: isAdmin ?? false,
       },
     });
 
