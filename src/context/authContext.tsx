@@ -15,19 +15,20 @@ interface User {
   name?: string | null;
   email?: string | null;
   image?: string | null;
-  // adicione mais campos do session.user se precisar
+  // adicionar campos adicionais conforme necessário
 }
 
 interface AuthContextProps {
   isAuthenticated: boolean;
   user: User | null;
   logout: () => void;
+  updateUser: (userData: Partial<User>) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export function AuthProviderWrapper({ children }: { children: ReactNode }) {
-  // Envolva o NextAuth SessionProvider aqui
   return (
     <SessionProvider>
       <AuthProvider>{children}</AuthProvider>
@@ -44,13 +45,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(status === "authenticated");
     setUser(session?.user ?? null);
   }, [status, session]);
-
   const logout = () => {
     signOut({ redirect: false });
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
+    }
+  };
+
+  const refreshUser = async () => {
+    if (session?.user?.id) {
+      try {
+        const response = await fetch(`/api/users/${session.user.id}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setUser({
+            ...session.user,
+            name: userData.name,
+            email: userData.email,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar dados do usuário:", error);
+      }
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, logout, updateUser, refreshUser }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -52,7 +52,7 @@ interface Address {
 }
 
 export default function PerfilPage() {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, updateUser } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     "perfil" | "enderecos" | "pedidos" | "configuracoes"
@@ -64,7 +64,40 @@ export default function PerfilPage() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    phone: "",
+    street: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "",
+    state: "",
+    zipCode: "",
   });
+  const fetchUserData = useCallback(async () => {
+    if (!user?.id) return;
+
+    try {
+      const response = await fetch(`/api/users/${user.id}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setFormData({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          street: userData.street || "",
+          number: userData.number || "",
+          complement: userData.complement || "",
+          neighborhood: userData.neighborhood || "",
+          city: userData.city || "",
+          state: userData.state || "",
+          zipCode: userData.zipCode || "",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar dados do usuário:", error);
+    }
+  }, [user?.id]);
+
   const fetchOrders = useCallback(async () => {
     if (!user?.id) return;
 
@@ -78,27 +111,16 @@ export default function PerfilPage() {
       console.error("Erro ao buscar pedidos:", error);
     }
   }, [user?.id]);
-
   useEffect(() => {
     if (!isAuthenticated) {
       router.replace("/login");
     } else {
-      setFormData({
-        name: user?.name || "",
-        email: user?.email || "",
-      });
+      fetchUserData();
       if (activeTab === "pedidos") {
         fetchOrders();
       }
     }
-  }, [
-    isAuthenticated,
-    user?.name,
-    user?.email,
-    activeTab,
-    router,
-    fetchOrders,
-  ]);
+  }, [isAuthenticated, activeTab, router, fetchOrders, fetchUserData]);
 
   if (!isAuthenticated) return null;
 
@@ -106,12 +128,39 @@ export default function PerfilPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
   const handleSave = async () => {
+    if (!user?.id) return;
+
     setLoading(true);
     try {
-      console.log("Salvando dados:", formData);
-      setIsEditing(false);
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const updatedUserData = await response.json();
+
+        updateUser({
+          name: updatedUserData.name,
+          email: updatedUserData.email,
+        });
+
+        await fetchUserData();
+
+        setIsEditing(false);
+
+        alert("Perfil atualizado com sucesso!");
+      } else {
+        const error = await response.json();
+        console.error("Erro ao salvar perfil:", error);
+        alert("Erro ao salvar perfil: " + (error.error || "Erro desconhecido"));
+      }
     } catch (error) {
       console.error("Erro ao salvar perfil:", error);
+      alert("Erro ao salvar perfil");
     } finally {
       setLoading(false);
     }
@@ -277,7 +326,7 @@ export default function PerfilPage() {
                               />
                             ) : (
                               <p className="font-medium text-gray-900">
-                                {user?.name || "Não informado"}
+                                {formData.name || "Não informado"}
                               </p>
                             )}
                           </div>
@@ -300,7 +349,7 @@ export default function PerfilPage() {
                               />
                             ) : (
                               <p className="font-medium text-gray-900">
-                                {user?.email}
+                                {formData.email}
                               </p>
                             )}
                           </div>
@@ -313,9 +362,20 @@ export default function PerfilPage() {
                           </div>
                           <div>
                             <p className="text-sm text-gray-600">Telefone</p>
-                            <p className="font-medium text-gray-900">
-                              Não informado
-                            </p>
+                            {isEditing ? (
+                              <input
+                                type="tel"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                placeholder="(11) 99999-9999"
+                                className="w-full mt-1 px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              />
+                            ) : (
+                              <p className="font-medium text-gray-900">
+                                {formData.phone || "Não informado"}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -334,27 +394,147 @@ export default function PerfilPage() {
                               </span>
                             </div>
                           </div>
-                        </div>
+                        </div>{" "}
                       </div>
                     </div>
 
                     {isEditing && (
-                      <div className="flex gap-4 mt-8">
-                        <Button
-                          onClick={handleSave}
-                          disabled={loading}
-                          className="bg-gradient-to-r from-green-600 to-emerald-500"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          {loading ? "Salvando..." : "Salvar Alterações"}
-                        </Button>
-                        <Button
-                          onClick={() => setIsEditing(false)}
-                          variant="outline"
-                        >
-                          <X className="w-4 h-4 mr-2" />
-                          Cancelar
-                        </Button>
+                      <div className="mt-8">
+                        <h3 className="text-xl font-bold text-gray-900 mb-6">
+                          Endereço Principal
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              CEP
+                            </label>
+                            <input
+                              type="text"
+                              name="zipCode"
+                              value={formData.zipCode}
+                              onChange={handleChange}
+                              placeholder="00000-000"
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Rua/Avenida
+                            </label>
+                            <input
+                              type="text"
+                              name="street"
+                              value={formData.street}
+                              onChange={handleChange}
+                              placeholder="Nome da rua"
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Número
+                            </label>
+                            <input
+                              type="text"
+                              name="number"
+                              value={formData.number}
+                              onChange={handleChange}
+                              placeholder="123"
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Complemento
+                            </label>
+                            <input
+                              type="text"
+                              name="complement"
+                              value={formData.complement}
+                              onChange={handleChange}
+                              placeholder="Apto, Bloco, etc."
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Bairro
+                            </label>
+                            <input
+                              type="text"
+                              name="neighborhood"
+                              value={formData.neighborhood}
+                              onChange={handleChange}
+                              placeholder="Nome do bairro"
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Cidade
+                            </label>
+                            <input
+                              type="text"
+                              name="city"
+                              value={formData.city}
+                              onChange={handleChange}
+                              placeholder="Nome da cidade"
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          </div>
+
+                          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Estado
+                            </label>
+                            <select
+                              name="state"
+                              value={formData.state}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  state: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            >
+                              <option value="">Selecione o Estado</option>
+                              <option value="SP">São Paulo</option>
+                              <option value="RJ">Rio de Janeiro</option>
+                              <option value="MG">Minas Gerais</option>
+                              <option value="RS">Rio Grande do Sul</option>
+                              <option value="PR">Paraná</option>
+                              <option value="SC">Santa Catarina</option>
+                              <option value="BA">Bahia</option>
+                              <option value="GO">Goiás</option>
+                              <option value="PE">Pernambuco</option>
+                              <option value="CE">Ceará</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-4 mt-8">
+                          <Button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="bg-gradient-to-r from-green-600 to-emerald-500"
+                          >
+                            <Save className="w-4 h-4 mr-2" />
+                            {loading ? "Salvando..." : "Salvar Alterações"}
+                          </Button>
+                          <Button
+                            onClick={() => setIsEditing(false)}
+                            variant="outline"
+                          >
+                            <X className="w-4 h-4 mr-2" />
+                            Cancelar
+                          </Button>
+                        </div>
                       </div>
                     )}
                   </div>
