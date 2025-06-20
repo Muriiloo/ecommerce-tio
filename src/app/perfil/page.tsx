@@ -64,7 +64,8 @@ export default function PerfilPage() {
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-  });  const fetchOrders = useCallback(async () => {
+  });
+  const fetchOrders = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -90,7 +91,14 @@ export default function PerfilPage() {
         fetchOrders();
       }
     }
-  }, [isAuthenticated, user?.name, user?.email, activeTab, router, fetchOrders]);
+  }, [
+    isAuthenticated,
+    user?.name,
+    user?.email,
+    activeTab,
+    router,
+    fetchOrders,
+  ]);
 
   if (!isAuthenticated) return null;
 
@@ -100,8 +108,6 @@ export default function PerfilPage() {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Aqui você implementaria a API para atualizar o perfil
-      // Por enquanto, apenas simula o salvamento
       console.log("Salvando dados:", formData);
       setIsEditing(false);
     } catch (error) {
@@ -165,7 +171,6 @@ export default function PerfilPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/30">
-      {/* Background Effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-400/15 to-pink-600/15 rounded-full blur-3xl"></div>
         <div className="absolute top-1/3 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/15 to-indigo-600/15 rounded-full blur-3xl"></div>
@@ -173,7 +178,6 @@ export default function PerfilPage() {
 
       <div className="relative">
         <div className="container mx-auto px-6 py-20">
-          {/* Header */}
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-500 via-amber-700 to-orange-900 rounded-3xl mb-8 shadow-2xl">
               <User className="w-10 h-10 text-white" />
@@ -187,10 +191,8 @@ export default function PerfilPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
             <div className="lg:col-span-1">
               <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/20 sticky top-6">
-                {/* Profile Summary */}
                 <div className="text-center mb-8">
                   <div className="relative inline-block">
                     <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-4 mx-auto">
@@ -206,7 +208,6 @@ export default function PerfilPage() {
                   <p className="text-gray-600 text-sm">{user?.email}</p>
                 </div>
 
-                {/* Navigation */}
                 <nav className="space-y-2">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
@@ -237,10 +238,8 @@ export default function PerfilPage() {
               </div>
             </div>
 
-            {/* Main Content */}
             <div className="lg:col-span-3">
               <div className="bg-white/40 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
-                {/* Perfil Tab */}
                 {activeTab === "perfil" && (
                   <div>
                     <div className="flex items-center justify-between mb-8">
@@ -361,7 +360,6 @@ export default function PerfilPage() {
                   </div>
                 )}
 
-                {/* Endereços Tab */}
                 {activeTab === "enderecos" && (
                   <div>
                     <div className="mb-8">
@@ -383,7 +381,6 @@ export default function PerfilPage() {
                   </div>
                 )}
 
-                {/* Pedidos Tab */}
                 {activeTab === "pedidos" && (
                   <div>
                     <div className="flex items-center justify-between mb-8">
@@ -461,7 +458,6 @@ export default function PerfilPage() {
                   </div>
                 )}
 
-                {/* Configurações Tab */}
                 {activeTab === "configuracoes" && (
                   <div>
                     <div className="mb-8">
