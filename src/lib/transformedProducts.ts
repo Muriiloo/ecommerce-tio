@@ -7,6 +7,7 @@ export const transformProducts = (products: Product[] = []) => {
     image: product.imageUrl || null,
     description: product.description,
     price: Number(product.price),
-     stockQuantity: product.stockQuantity,
+    stockQuantity: product.stockQuantity,
+    isFeatured: product.isFeatured,
   }));
 };

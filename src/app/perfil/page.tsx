@@ -219,7 +219,7 @@ export default function PerfilPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/30">
+    <div className="min-h-screen bg-gray-200">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-400/15 to-pink-600/15 rounded-full blur-3xl"></div>
         <div className="absolute top-1/3 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/15 to-indigo-600/15 rounded-full blur-3xl"></div>
@@ -247,7 +247,7 @@ export default function PerfilPage() {
                     <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center mb-4 mx-auto">
                       <User className="w-10 h-10 text-purple-600" />
                     </div>
-                    <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-600 transition-colors">
+                    <button className="cursor-pointer absolute -bottom-2 -right-2 w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center shadow-lg hover:bg-yellow-600 transition-colors">
                       <Camera className="w-4 h-4 text-white" />
                     </button>
                   </div>
@@ -272,7 +272,7 @@ export default function PerfilPage() {
                               | "configuracoes"
                           )
                         }
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                        className={`cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                           activeTab === tab.id
                             ? "bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900 text-white shadow-lg"
                             : "text-gray-700 hover:bg-white/60"
@@ -298,7 +298,7 @@ export default function PerfilPage() {
                       {!isEditing && (
                         <Button
                           onClick={() => setIsEditing(true)}
-                          className="bg-gradient-to-r from-purple-600 to-pink-600"
+                          className="cursor-pointer bg-gradient-to-r from-purple-600 to-pink-600"
                         >
                           <Edit3 className="w-4 h-4 mr-2" />
                           Editar
@@ -587,7 +587,7 @@ export default function PerfilPage() {
                           Você ainda não fez nenhum pedido
                         </p>
                         <Link href="/produtos">
-                          <Button className="bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900">
+                          <Button className="cursor-pointer bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900">
                             Explorar Produtos
                           </Button>
                         </Link>

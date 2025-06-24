@@ -22,6 +22,7 @@ type Product = {
   details?: string;
   price: number;
   stockQuantity: number;
+  isFeatured: boolean;
   category: "masculino" | "feminino" | "infantil" | "acessório";
 };
 
@@ -40,6 +41,7 @@ export default function CadastrarProduto() {
   const [products, setProducts] = useState<Product[]>([]);
   const [, setIsLoadingProducts] = useState(true);
   const [category, setCategory] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
 
   useEffect(() => {
     async function validateUser() {
@@ -108,6 +110,7 @@ export default function CadastrarProduto() {
     formData.append("price", price);
     formData.append("stockQuantity", stockQuantity);
     formData.append("category", category);
+    formData.append("isFeatured", String(isFeatured));
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
@@ -153,7 +156,9 @@ export default function CadastrarProduto() {
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-screen-xl mx-auto bg-white rounded-lg shadow overflow-hidden">
         <section className="p-8 space-y-6">
-          <h2 className="text-3xl font-bold text-gray-900">Cadastrar Produto</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Cadastrar Produto
+          </h2>
           <form
             className="grid grid-cols-1 gap-4 md:grid-cols-2"
             onSubmit={handleSubmit}
@@ -233,6 +238,21 @@ export default function CadastrarProduto() {
               </select>
             </div>
             <div>
+              <Label htmlFor="isFeatured">Destacar na página inicial</Label>
+              <div className="mt-2 flex items-center gap-2">
+                <input
+                  id="isFeatured"
+                  type="checkbox"
+                  checked={isFeatured}
+                  onChange={(e) => setIsFeatured(e.target.checked)}
+                  className="h-5 w-5 border-gray-300 rounded"
+                />
+                <span className="text-sm text-gray-700">
+                  Marcar como destaque
+                </span>
+              </div>
+            </div>
+            <div>
               <Label>Imagens do produto*</Label>
               <Input
                 type="file"
@@ -283,6 +303,9 @@ export default function CadastrarProduto() {
                   <TableHead className="px-4 py-3 text-left text-sm font-semibold uppercase text-gray-700">
                     Descrição
                   </TableHead>
+                  <TableHead className="px-4 py-3 text-center text-sm font-semibold uppercase text-gray-700">
+                    Destaque
+                  </TableHead>
                   <TableHead className="px-4 py-3 text-right text-sm font-semibold uppercase text-gray-700">
                     Preço
                   </TableHead>
@@ -315,6 +338,9 @@ export default function CadastrarProduto() {
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-600 truncate">
                         {item.description || "-"}
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-center text-gray-800">
+                        {item.isFeatured ? "⭐" : "-"}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-800 text-right">
                         R$ {Number(item.price).toFixed(2)}

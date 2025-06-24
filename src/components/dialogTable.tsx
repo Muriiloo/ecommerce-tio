@@ -48,26 +48,27 @@ export default function DialogTable({ product }: DialogTableProps) {
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="w-full max-w-4xl p-0 sm:rounded-lg z-[9999] overflow-auto max-h-[90vh]">
-        <div className="flex flex-col md:flex-row">
-          <div className="w-full md:w-1/2 bg-white flex items-center justify-center p-4">
+      <DialogContent className="w-full !max-w-7xl p-0 sm:rounded-lg z-[9999] overflow-auto">
+        <div className="flex flex-col md:flex-row !max-w-7xl !max-h-[90vh]">
+          <div className="w-full md:w-1/3 bg-white flex items-center justify-center px-4">
             <Image
               src={hovered ? measureImages[hovered] : defaultImage}
               alt="teste"
               width={300}
-              height={400}
-              className="object-contain max-h-[400px] w-auto"
+              height={500}
+              className="object-cover max-h-[500px] w-auto"
             />
           </div>
 
-          <div className="w-full md:w-1/2 bg-white p-4 overflow-auto">
+          <div className="w-full md:w-2/3 bg-white p-4 overflow-auto">
             <DialogHeader>
               <DialogTitle className="text-lg sm:text-2xl mb-4">
                 Compare as medidas com esta tabela.
               </DialogTitle>
             </DialogHeader>
 
-            <table className="min-w-full text-sm sm:text-base border-t border-gray-300">
+            <table className="min-w-full text-sm sm:text-base border-t border-gray-300 scale-90">
+
               <thead>
                 <tr className="text-left border-b border-gray-300">
                   <th className="px-4 py-2">TAMANHO</th>
