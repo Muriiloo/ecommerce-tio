@@ -2,17 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useCart } from "@/context/cartContext";
-import Image from "next/image";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, FreeMode, Thumbs } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/thumbs";
-import "swiper/css/free-mode";
-import "swiper/css/navigation";
 import ProductCard from "@/components/productCard";
-import type { Swiper as SwiperClass } from "swiper";
 import DialogTable from "@/components/dialogTable";
 import ProductFreteCalculator from "@/components/freteCalculator";
+import SwiperProductDetails from "@/components/swiperProductDetails";
 import { Button } from "./ui/button";
 
 interface ProductDetailsProps {
@@ -33,7 +26,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
   const { addToCart } = useCart();
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<
     ProductDetailsProps["product"][]
   >([]);
@@ -74,53 +66,11 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Carrossel de imagens */}
         <div className="w-full md:w-1/2">
-          <Swiper
-            style={
-              {
-                "--swiper-navigation-color": "#000",
-                "--swiper-pagination-color": "#000",
-              } as React.CSSProperties
-            }
-            spaceBetween={10}
-            navigation={true}
-            thumbs={{ swiper: thumbsSwiper }}
-            modules={[FreeMode, Navigation, Thumbs]}
-            className="rounded-xl"
-          >
-            {[product.imageUrl, ...product.images].map((img, index) => (
-              <SwiperSlide key={index}>
-                <Image
-                  src={img}
-                  alt={`${product.name} - ${index + 1}`}
-                  width={1920}
-                  height={1080}
-                  className="object-cover w-full h-auto rounded-xl"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-
-          <Swiper
-            onSwiper={setThumbsSwiper}
-            spaceBetween={10}
-            slidesPerView={4}
-            freeMode={true}
-            watchSlidesProgress={true}
-            modules={[FreeMode, Navigation, Thumbs]}
-            className="mt-4"
-          >
-            {[product.imageUrl, ...product.images].map((img, index) => (
-              <SwiperSlide key={index}>
-                <Image
-                  src={img}
-                  alt={`Thumbnail ${index + 1}`}
-                  width={500}
-                  height={500}
-                  className="object-cover w-full h-auto rounded-md border"
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          <SwiperProductDetails
+            name={product.name}
+            imageUrl={product.imageUrl}
+            images={product.images}
+          />
         </div>
 
         {/* Detalhes e seleção */}
@@ -131,6 +81,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             R$ {product.price.toFixed(2)}
           </p>
           <div className="w-full h-px bg-gray-300 my-8" />
+
           <div className="mb-12">
             <p className="font-semibold mb-3">Escolha a cor:</p>
             <div className="flex gap-3">
@@ -139,7 +90,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                   key={color}
                   onClick={() => setSelectedColor(color)}
                   className={`w-10 h-10 rounded-full border-2 cursor-pointer ${
-                    selectedColor === color ? "border-black" : "border-gray-300"
+                    selectedColor === color
+                      ? "border-black"
+                      : "border-gray-300"
                   }`}
                   style={{ backgroundColor: color }}
                 />
@@ -166,7 +119,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             </div>
             <DialogTable product={product} />
           </div>
+
           <div className="w-full h-px bg-gray-300 my-8" />
+
           <div>
             <Button
               onClick={handleAddToCart}
@@ -186,7 +141,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       {/* Descrição e detalhes */}
       <div className="space-y-12">
         <div>
-          <h2 className="text-xl font-semibold mb-4 italic">Descrição Longa</h2>
+          <h2 className="text-xl font-semibold mb-4 italic">
+            Descrição Longa
+          </h2>
           <p className="text-gray-700 whitespace-pre-line">
             {product.description}
           </p>
@@ -205,7 +162,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Avaliações</h2>
         <div className="space-y-4">
-          {[
+          {[ 
             {
               name: "João S.",
               rating: "⭐⭐⭐⭐⭐",
@@ -230,7 +187,9 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
 
       {/* Produtos relacionados */}
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Produtos Relacionados</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Produtos Relacionados
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {relatedProducts.length > 0 ? (
             relatedProducts.map((item) => (

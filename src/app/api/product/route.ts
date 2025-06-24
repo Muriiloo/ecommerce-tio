@@ -9,6 +9,7 @@ export const POST = async (request: Request) => {
 
     // Campos do formulário
     const name = formData.get("name")?.toString();
+    const isFeatured = formData.get("isFeatured") === "true";
     const description = formData.get("description")?.toString() || "";
     const details = formData.get("details")?.toString() || "";
     const price = Number(formData.get("price") || 0);
@@ -45,6 +46,7 @@ export const POST = async (request: Request) => {
 
     // A primeira imagem será a imagem principal
     const imageUrl = imageUrls[0];
+    
 
     // Criação do produto no banco de dados
     const createdProduct = await db.product.create({
@@ -56,6 +58,7 @@ export const POST = async (request: Request) => {
         category,
         details,
         imageUrl,
+        isFeatured,
         images: {
           create: imageUrls.map((url) => ({
             imageUrl: url,

@@ -14,6 +14,7 @@ interface ProductCardProps {
     description: string;
     price: number;
     stockQuantity: number;
+    isFeatured?: boolean;
   };
 }
 
@@ -24,6 +25,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const handleCardClick = () => {
     router.push(`/productPage/${product.id}`);
   };
+
+  console.log(product);
 
   return (
     <Card
@@ -45,6 +48,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
               <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
             )}
           </div>
+
+          {/* Badge de DESTAQUE */}
+          {product.isFeatured && (
+            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-md z-10">
+              DESTAQUE
+            </span>
+          )}
 
           {/* Badge de NOVO */}
           <span className="absolute top-4 right-4 bg-white/80 px-3 py-1 rounded-full text-xs font-semibold text-blue-600 shadow">
