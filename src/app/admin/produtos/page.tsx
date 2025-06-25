@@ -152,6 +152,23 @@ export default function CadastrarProduto() {
     }
   };
 
+  const handleToggleFeatured = async (id: string) => {
+    try {
+      const res = await fetch(`/api/product/${id}`, { method: "PATCH" });
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === id ? result.product : p))
+        );
+      } else {
+        alert(result.error || "Erro ao alternar destaque.");
+      }
+    } catch {
+      alert("Erro ao alternar destaque.");
+    }
+  };
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-screen-xl mx-auto bg-white rounded-lg shadow overflow-hidden">
@@ -340,7 +357,15 @@ export default function CadastrarProduto() {
                         {item.description || "-"}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-center text-gray-800">
-                        {item.isFeatured ? "⭐" : "-"}
+                        <Button
+                        variant={item.isFeatured ? "default" : "secondary"}
+                        size="sm"
+                        className="px-3 py-1"
+                        onClick={() => handleToggleFeatured(item.id)}
+                        >
+                          {item.isFeatured ? "Remover destaque" : "Destacar"}
+                        </Button>
+                        {item.isFeatured && <span>⭐</span>}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-800 text-right">
                         R$ {Number(item.price).toFixed(2)}

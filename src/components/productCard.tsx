@@ -26,8 +26,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
     router.push(`/productPage/${product.id}`);
   };
 
-  console.log(product);
-
   return (
     <Card
       onClick={handleCardClick}
