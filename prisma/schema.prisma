@@ -18,7 +18,6 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt
 
-  // Endereço principal do usuário
   street       String?
   number       String?
   complement   String?
@@ -30,7 +29,7 @@ model User {
 
   accounts  Account[]
   sessions  Session[]
-  addresses Address[] // Múltiplos endereços
+  addresses Address[] 
 
   orders Order[]
 }

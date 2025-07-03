@@ -228,33 +228,6 @@ const ProdutosPage = async ({ searchParams }: Props) => {
             </div>
           </div>
         </section>
-
-        {/* Newsletter */}
-        <section className="container mx-auto px-6 pb-20">
-          <div className="bg-gradient-to-r from-purple-600/90 via-pink-600/90 to-rose-600/90 backdrop-blur-sm rounded-3xl p-12 text-center shadow-2xl border border-white/20">
-            <div className="max-w-2xl mx-auto">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-3xl font-bold text-white mb-4">
-                Fique por Dentro das Novidades
-              </h3>
-              <p className="text-white/90 text-lg mb-8">
-                Receba em primeira mão os lançamentos e promoções exclusivas
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Seu melhor e-mail"
-                  className="flex-1 px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl placeholder-white/70 text-white focus:outline-none focus:ring-2 focus:ring-white/50"
-                />
-                <button className="px-8 py-4 bg-white text-purple-600 font-semibold rounded-2xl hover:bg-white/90 transition-all duration-300 hover:scale-105">
-                  Cadastrar
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );

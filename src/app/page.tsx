@@ -16,7 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const Home = async () => {
   const products = await db.product.findMany({});
   const transformedProducts = transformProducts(products);
-  const featuredProducts = products.filter(p => p.isFeatured);
+  const featuredProducts = products.filter((p) => p.isFeatured);
 
   const images = [
     { src: "/teste.jpg", alt: "Produto 1", title: "Novidades da Temporada" },
@@ -48,7 +48,8 @@ const Home = async () => {
                           {image.title}
                         </h1>
                         <p className="text-lg md:text-xl max-w-2xl mx-auto px-4">
-                          Descubra nossa coleção exclusiva com os melhores produtos
+                          Descubra nossa coleção exclusiva com os melhores
+                          produtos
                         </p>
                       </div>
                     </div>
@@ -62,7 +63,6 @@ const Home = async () => {
         </Carousel>
       </section>
 
-      {/* ⬇️ Swiper de Destaques */}
       <FeaturedProductsSwiper products={featuredProducts} />
 
       <section className="container mx-auto px-4 py-16">
@@ -76,9 +76,15 @@ const Home = async () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
-          {transformedProducts.map((produto) => (
-            <ProductCard key={produto.id} product={produto} />
-          ))}
+          {transformedProducts.length ? (
+            transformedProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          ) : (
+            <div className="col-span-full text-center text-gray-500">
+              Nenhum produto encontrado.
+            </div>
+          )}
         </div>
       </section>
     </div>
