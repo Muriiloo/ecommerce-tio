@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import Link from "next/link";
 import ProductCard from "@/components/productCard";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -27,7 +28,6 @@ const FeaturedProductsSwiper = ({ products }: FeaturedProductsSwiperProps) => {
       prevRef.current &&
       nextRef.current
     ) {
-      // Fazendo cast de tipo seguro
       const navigation = swiperInstance.params.navigation;
       navigation.prevEl = prevRef.current;
       navigation.nextEl = nextRef.current;
@@ -41,12 +41,12 @@ const FeaturedProductsSwiper = ({ products }: FeaturedProductsSwiperProps) => {
   if (!products.length) return null;
 
   return (
-    <section className="container mx-auto px-4 py-16">
+    <section className="container mx-auto px-4 py-16 mt-48">
       <div className="text-center mb-10">
-        <h2 className="text-3xl md:text-4xl font-semibold italic text-gray-900 mb-1">
-          Destaques
+        <h2 className="font-century text-3xl md:text-4xl font-semibold text-gray-900 mb-1 uppercase">
+          lançamentos
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto italic">
+        <p className="font-century text-lg text-gray-600 max-w-2xl mx-auto">
           Produtos selecionados especialmente para você
         </p>
       </div>
@@ -93,6 +93,16 @@ const FeaturedProductsSwiper = ({ products }: FeaturedProductsSwiperProps) => {
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Botão para ver todos os destaques */}
+      <div className="flex justify-center mt-4">
+        <Link
+          href="/produtos?featured=true"
+          className="px-10 py-2 bg-black text-white hover:bg-gray-800 transition uppercase text-sm"
+        >
+          Ver todos os lançamentos
+        </Link>
+      </div>
     </section>
   );
 };

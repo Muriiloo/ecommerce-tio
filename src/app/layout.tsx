@@ -1,16 +1,17 @@
 "use client";
 
-import { Poppins } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
 import WhatsappButton from "@/components/whatsappButton";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import TopBanner from "@/components/topBanner";
 import { usePathname } from "next/navigation";
 import { CartProvider } from "@/context/cartContext";
 import { SessionProvider } from "next-auth/react";
 import { AuthProvider } from "@/context/authContext";
 
-const poppins = Poppins({
+const montserrat = Montserrat({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
 });
@@ -27,7 +28,7 @@ export default function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${poppins.className} antialiased`}>
+      <body className={`${montserrat.className} antialiased bg-gray-50`}>
         <SessionProvider>
           <AuthProvider>
             <CartProvider>
@@ -35,6 +36,9 @@ export default function RootLayout({
                 {!isAdmin && !hideHeaderFooter && !hideRegister && (
                   <WhatsappButton />
                 )}
+
+                {!isAdmin && !hideHeaderFooter && !hideRegister && <TopBanner />}
+
                 {!isAdmin && !hideHeaderFooter && !hideRegister && <Header />}
 
                 <main className="flex-grow">{children}</main>

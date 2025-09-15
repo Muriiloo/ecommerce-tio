@@ -25,7 +25,9 @@ const MiniCart = () => {
 
       <div
         className={`absolute right-0 mt-2 w-80 bg-white text-black rounded-lg shadow-lg z-50 p-4 transition-all duration-200 transform ${
-          isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+          isOpen
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-95 pointer-events-none"
         }`}
       >
         <div className="flex justify-between items-center mb-2">
@@ -55,7 +57,12 @@ const MiniCart = () => {
                     </button>
                     <button
                       onClick={() => increaseQty(item.id)}
-                      className="px-2 py-1 bg-gray-200 rounded"
+                      disabled={item.quantity >= item.stockQuantity}
+                      className={`px-2 py-1 rounded ${
+                        item.quantity >= item.stockQuantity
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-gray-200"
+                      }`}
                     >
                       +
                     </button>

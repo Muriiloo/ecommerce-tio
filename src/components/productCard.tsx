@@ -29,70 +29,62 @@ const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Card
       onClick={handleCardClick}
-      className="group relative overflow-hidden rounded-lg border border-gray-300 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.010] cursor-pointer"
+      className="group relative flex flex-col overflow-hidden cursor-pointer border-0 bg-gray-50"
     >
-      <CardContent className="p-0">
-        <div className="relative h-90 flex items-center justify-center">
-          {/* Imagem */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {product.image ? (
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
-            )}
+      {/* Imagem */}
+      <div className="relative w-full aspect-[3/4]">
+        {product.image ? (
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
           </div>
+        )}
 
-          {/* Badge de DESTAQUE */}
-          {product.isFeatured && (
-            <span className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold shadow-md z-10">
-              DESTAQUE
-            </span>
-          )}
-
-          {/* Badge de NOVO */}
-          <span className="absolute top-4 right-4 bg-white/80 px-3 py-1 rounded-full text-xs font-semibold text-blue-600 shadow">
-            NOVO
+        {product.isFeatured && (
+          <span className="absolute top-2 bg-yellow-400 text-black text-[10px] font-light px-2 py-1 uppercase">
+            Lançamento
           </span>
+        )}
 
-          {/* Badge de ESTOQUE BAIXO */}
-          {isLowStock && (
-            <span className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold shadow animate-pulse">
-              Últimas {product.stockQuantity} unidades!
-            </span>
-          )}
+        {isLowStock && (
+          <span className="absolute top-2 right-0 bg-red-600 text-white text-[10px] font-light px-2 py-1">
+            Últimas {product.stockQuantity}
+          </span>
+        )}
+      </div>
+
+      {/* Conteúdo */}
+      <CardContent className="flex flex-col items-center text-center py-4 px-0">
+        <h3 className="text-xs font-medium text-gray-800 mb-2 min-h-[2rem]">
+          {product.name}
+        </h3>
+
+        {/* Preços */}
+        <div className="flex flex-col items-center text-sm pb-4">
+          <p className="text-lg font-semibold text-gray-900">
+            R$ {(product.price * 0.88).toFixed(2)} <span className="text-xs">no pix</span>
+          </p>
+          <p className="text-gray-500 text-xs">
+            <span className="text-sm">R$ {Number(product.price).toFixed(2)}</span> em até 12x de R$ {(product.price / 12).toFixed(2)}
+          </p>
         </div>
 
-        <div className="p-6 text-center">
-          <h3 className="text-md font-medium text-gray-700 min-h-[3rem] leading-tight">
-            {product.name}
-          </h3>
-
-          {/* Linha separadora */}
-          <div className="w-full h-px bg-gray-300 my-2" />
-
-          <div className="flex flex-col items-center">
-            <span className="text-lg font-semibold text-blue-500 drop-shadow">
-              R$ {Number(product.price).toFixed(2)}
-            </span>
-
-            <div className="flex justify-center mt-4 w-full">
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/productPage/${product.id}`);
-                }}
-                className="bg-gradient-to-r transition-colors duration-300 from-blue-500 to-teal-400 group-hover:from-blue-700 text-white px-4 py-2 rounded font-semibold w-full cursor-pointer"
-              >
-                Ver detalhes
-              </Button>
-            </div>
-          </div>
-        </div>
+        {/* Botão */}
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/productPage/${product.id}`);
+          }}
+          className="mt-4 w-full bg-black text-white rounded-xs cursor-pointer hover:bg-white hover:text-black hover:border hover:border-black transition-colors duration-300"
+        >
+          EU QUERO
+        </Button>
       </CardContent>
     </Card>
   );
