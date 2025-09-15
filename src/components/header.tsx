@@ -86,7 +86,7 @@ const Header = () => {
             <nav className="hidden md:flex items-center space-x-8">
               <Link href="/" className="text-white hover:text-gray-300 link-underline pb-3">Home</Link>
               <Link href="/produtos" className="text-white hover:text-gray-300 link-underline pb-3">Produtos</Link>
-              <Link href="/sobre" className="text-white hover:text-gray-300 link-underline pb-3">Sobre nós</Link>
+              
               <Link href="/contato" className="text-white hover:text-gray-300 link-underline pb-3">Contato</Link>
               {isAdmin && (
                 <Link href="/admin/dashboard" className="text-white hover:text-gray-300 link-underline pb-3">
@@ -176,7 +176,6 @@ const Header = () => {
             <nav className="mt-8 flex flex-col gap-4">
               <Link href="/" onClick={handleCloseMenu}><span className="link-underline">Home</span></Link>
               <Link href="/produtos" onClick={handleCloseMenu}><span className="link-underline">Produtos</span></Link>
-              <Link href="/sobre" onClick={handleCloseMenu}><span className="link-underline">Sobre nós</span></Link>
               <Link href="/contato" onClick={handleCloseMenu}><span className="link-underline">Contato</span></Link>
               {isAdmin && (
                 <Link href="/admin/dashboard" onClick={handleCloseMenu}><span className="link-underline">Admin</span></Link>

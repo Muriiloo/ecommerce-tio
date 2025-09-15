@@ -14,11 +14,13 @@ export const POST = async (request: Request) => {
     const details = formData.get("details")?.toString() || "";
     const price = Number(formData.get("price") || 0);
     const stockQuantity = Number(formData.get("stockQuantity") || 0);
+    const shoeSize = formData.get("shoeSize") ? Number(formData.get("shoeSize")) : null;
     const category = formData.get("category")?.toString() as
       | "masculino"
       | "feminino"
       | "infantil"
-      | "acessório";
+      | "acessorio"
+      | "calcado";
 
     // Verificações básicas
     const files = formData.getAll("images") as File[];
@@ -59,6 +61,7 @@ export const POST = async (request: Request) => {
         details,
         imageUrl,
         isFeatured,
+        shoeSize,
         images: {
           create: imageUrls.map((url) => ({
             imageUrl: url,

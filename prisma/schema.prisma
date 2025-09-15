@@ -29,7 +29,7 @@ model User {
 
   accounts  Account[]
   sessions  Session[]
-  addresses Address[] 
+  addresses Address[]
 
   orders Order[]
 }
@@ -103,13 +103,15 @@ model Product {
   orderItems    OrderItem[]
   images        ProductImage[]
   category      Category
+  shoeSize      Decimal?       @db.Decimal(4, 1)
 }
 
 enum Category {
   masculino
   feminino
   infantil
-  acessório
+  acessorio
+  calcado
 }
 
 model Order {
@@ -137,13 +139,14 @@ model Order {
 }
 
 model OrderItem {
-  id              String  @id @default(uuid())
-  orderId         String
-  productId       String
-  quantity        Int
-  priceAtPurchase Decimal @db.Decimal(10, 2)
-  selectedSize    String?
-  selectedColor   String?
+  id               String   @id @default(uuid())
+  orderId          String
+  productId        String
+  quantity         Int
+  priceAtPurchase  Decimal  @db.Decimal(10, 2)
+  selectedSize     String?
+  selectedColor    String?
+  selectedShoeSize Decimal? @db.Decimal(4, 1)
 
   order   Order   @relation(fields: [orderId], references: [id])
   product Product @relation(fields: [productId], references: [id])

@@ -1,18 +1,32 @@
-import { transformProducts } from "@/lib/transformedProducts";
+'use client';
+
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/productCard";
-import { db } from "@/lib/prisma";
+import { transformProducts } from "@/lib/transformedProducts";
 import {
-  Sparkles,
+  ChevronDown,
   Filter,
   Grid3X3,
-  List,
   Search,
-  Tag,
-  Shirt,
-  Heart,
 } from "lucide-react";
-import Link from "next/link";
-import { Prisma } from "@prisma/client";
+
+import { Decimal } from "@prisma/client/runtime/library";
+
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  details: string | null;
+  price: Decimal;
+  stockQuantity: number;
+  size: string | null;
+  color: string | null;
+  imageUrl: string;
+  category: "masculino" | "feminino" | "infantil" | "acessorio" | "calcado";
+  shoeSize: Decimal | null;
+  isFeatured: boolean;
+  createdAt: Date;
+};
 
 type Props = {
   searchParams: {
@@ -21,252 +35,171 @@ type Props = {
   };
 };
 
-const ProdutosPage = async ({ searchParams }: Props) => {
-  const { category, featured } = searchParams;
-
-  const activeCategory = category?.toLowerCase() as
-    | "feminino"
-    | "masculino"
-    | "infantil"
-    | "acessório"
-    | undefined;
-
-  // aplica filtros
-  const whereClause: Prisma.ProductWhereInput = {};
-
-if (activeCategory) {
-  whereClause.category = activeCategory;
-}
-
-if (featured === "true") {
-  whereClause.isFeatured = true;
-}
-
-  if (activeCategory) {
-    whereClause.category = activeCategory;
-  }
-
-  if (featured === "true") {
-    whereClause.isFeatured = true;
-  }
-
-  const products = await db.product.findMany({
-    where: whereClause,
-  });
-
-  const transformedProducts = transformProducts(products);
+const ProdutosPage = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortOrder, setSortOrder] = useState<string>("name");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const categories = [
-    {
-      name: "Feminino",
-      key: "feminino",
-      count: 120,
-      color: "from-pink-500 to-rose-600",
-    },
-    {
-      name: "Masculino",
-      key: "masculino",
-      count: 80,
-      color: "from-blue-500 to-indigo-600",
-    },
-    {
-      name: "Infantil",
-      key: "infantil",
-      count: 45,
-      color: "from-green-500 to-emerald-600",
-    },
-    {
-      name: "Acessórios",
-      key: "acessório",
-      count: 35,
-      color: "from-purple-500 to-violet-600",
-    },
+    { key: "all", name: "Todas as Categorias" },
+    { key: "masculino", name: "Masculino" },
+    { key: "feminino", name: "Feminino" },
+    { key: "infantil", name: "Infantil" },
+    { key: "acessorio", name: "Acessórios" },
+    { key: "calcado", name: "Calçados" },
   ];
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/30">
-      {/* Efeitos de background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-400/15 to-pink-600/15 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/15 to-indigo-600/15 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-gradient-to-br from-rose-400/15 to-pink-600/15 rounded-full blur-3xl"></div>
+  const sortOptions = [
+    { key: "name", name: "Nome A-Z" },
+    { key: "price_asc", name: "Menor Preço" },
+    { key: "price_desc", name: "Maior Preço" },
+    { key: "featured", name: "Destaques" },
+  ];
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    filterAndSortProducts();
+  }, [products, selectedCategory, sortOrder, searchTerm]);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch("/api/product");
+      const data = await response.json();
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error("Erro ao carregar produtos:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filterAndSortProducts = () => {
+    let filtered = [...products];
+
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(product => product.category === selectedCategory);
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    switch (sortOrder) {
+      case "price_asc":
+        filtered.sort((a, b) => Number(a.price) - Number(b.price));
+        break;
+      case "price_desc":
+        filtered.sort((a, b) => Number(b.price) - Number(a.price));
+        break;
+      case "featured":
+        filtered.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+        break;
+      default:
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    setFilteredProducts(filtered);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando produtos...</p>
+        </div>
       </div>
+    );
+  }
 
-      <div className="relative">
-        {/* Cabeçalho e busca */}
-        <section className="container mx-auto px-6 py-20">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-500 via-amber-700 to-orange-900 rounded-3xl mb-8 shadow-2xl">
-              <Shirt className="w-10 h-10 text-white" />
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Buscar produtos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+              />
             </div>
-            <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900 bg-clip-text text-transparent mb-6">
-              Nossa Coleção
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              Descubra peças únicas e tendências da moda que combinam com seu
-              estilo pessoal
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <span className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-gray-700 shadow-lg border border-white/20">
-                <Tag className="w-4 h-4 mr-2" />
-                Novidades Semanais
-              </span>
-              <span className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-gray-700 shadow-lg border border-white/20">
-                <Heart className="w-4 h-4 mr-2" />
-                Qualidade Garantida
-              </span>
-              <span className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-medium text-gray-700 shadow-lg border border-white/20">
-                <Sparkles className="w-4 h-4 mr-2" />
-                Melhores Preços
-              </span>
-            </div>
-          </div>
-
-          {/* Barra de busca e filtros */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 mb-12">
-            <div className="flex flex-col lg:flex-row gap-6 items-center">
-              <div className="flex-1 relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar produtos..."
-                  className="w-full pl-12 pr-4 py-4 bg-white/80 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 placeholder-gray-400"
-                />
-              </div>
-
-              <div className="flex gap-3">
-                <button className="inline-flex items-center px-6 py-4 bg-gradient-to-r from-yellow-500 via-amber-700 to-orange-900 hover:to-orange-800 text-white font-semibold rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                  <Filter className="w-5 h-5 mr-2" />
-                  Filtros
-                </button>
-                <button className="inline-flex items-center px-4 py-4 bg-white/80 hover:bg-white border border-gray-200 rounded-2xl transition-all duration-300 hover:shadow-lg">
-                  <Grid3X3 className="w-5 h-5 text-gray-600" />
-                </button>
-                <button className="inline-flex items-center px-4 py-4 bg-white/80 hover:bg-white border border-gray-200 rounded-2xl transition-all duration-300 hover:shadow-lg">
-                  <List className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Filtro de categorias */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-16">
-            <Link href="/produtos" scroll={false}>
-              <div
-                className={`group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border ${
-                  !activeCategory
-                    ? "border-purple-500 ring-2 ring-purple-400"
-                    : "border-white/20"
-                } hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer`}
-              >
-                <div className="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-600 rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Shirt className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <h3
-                  className={`font-bold text-lg mb-1 ${
-                    !activeCategory ? "text-purple-700" : "text-gray-900"
-                  }`}
+            
+            <div className="flex gap-4">
+              <div className="relative">
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 >
-                  Todos
-                </h3>
-                <p className="text-gray-600 text-sm">Exibir tudo</p>
-              </div>
-            </Link>
-
-            {categories.map((category, index) => {
-              const isActive = activeCategory === category.key;
-
-              return (
-                <Link
-                  key={index}
-                  href={`?category=${category.key}`}
-                  scroll={false}
-                >
-                  <div
-                    className={`group bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-xl border ${
-                      isActive
-                        ? "border-purple-500 ring-2 ring-purple-400"
-                        : "border-white/20"
-                    } hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 cursor-pointer`}
-                  >
-                    <div
-                      className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}
-                    >
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Shirt className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                    <h3
-                      className={`font-bold text-lg mb-1 ${
-                        isActive ? "text-purple-700" : "text-gray-900"
-                      }`}
-                    >
+                  {categories.map((category) => (
+                    <option key={category.key} value={category.key}>
                       {category.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {category.count} produtos
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Lista de Produtos */}
-        <section className="container mx-auto px-6 pb-20">
-          <div className="bg-white/40 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
-                  {featured === "true"
-                    ? "Produtos em Destaque"
-                    : "Todos os Produtos"}
-                </h2>
-                <p className="text-gray-600">
-                  {transformedProducts.length} produtos encontrados
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <select className="px-4 py-3 bg-white/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 text-gray-700">
-                  <option>Mais Recentes</option>
-                  <option>Menor Preço</option>
-                  <option>Maior Preço</option>
-                  <option>Mais Vendidos</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="relative bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              {transformedProducts.length === 0 ? (
-                <div className="text-center text-gray-500 text-lg">
-                  Nenhum produto encontrado.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {transformedProducts.map((produto) => (
-                    <ProductCard key={produto.id} product={produto} />
+                    </option>
                   ))}
-                </div>
-              )}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              </div>
 
-              {/* Botão para ver todos os produtos caso esteja filtrado por destaques */}
-              {featured === "true" && (
-                <div className="flex justify-center mt-10">
-                  <Link
-                    href="/produtos"
-                    className="px-6 py-3 bg-black text-white rounded-full font-century hover:bg-gray-800 transition"
-                  >
-                    Ver todos os produtos
-                  </Link>
-                </div>
-              )}
+              <div className="relative">
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.key} value={option.key}>
+                      {option.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-1">
+                {selectedCategory === "all" 
+                  ? "Todos os Produtos" 
+                  : categories.find(c => c.key === selectedCategory)?.name
+                }
+              </h2>
+              <p className="text-gray-600">
+                {filteredProducts.length} produtos encontrados
+              </p>
+            </div>    
+          </div>
+        </div>
+
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg mb-4">Nenhum produto encontrado</p>
+            <p className="text-gray-400">Tente alterar os filtros ou buscar por outros termos</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {transformProducts(filteredProducts).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

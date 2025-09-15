@@ -42,6 +42,7 @@ export default function CadastrarProduto() {
   const [, setIsLoadingProducts] = useState(true);
   const [category, setCategory] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
+  const [shoeSize, setShoeSize] = useState("");
 
   useEffect(() => {
     async function validateUser() {
@@ -103,6 +104,11 @@ export default function CadastrarProduto() {
       return;
     }
 
+    if (category === "calcado" && !shoeSize) {
+      setErrorMsg("Para calçados, é obrigatório informar a numeração.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
@@ -111,6 +117,12 @@ export default function CadastrarProduto() {
     formData.append("stockQuantity", stockQuantity);
     formData.append("category", category);
     formData.append("isFeatured", String(isFeatured));
+    
+    // Adicionar shoeSize apenas se categoria for calçado
+    if (category === "calcado" && shoeSize) {
+      formData.append("shoeSize", shoeSize);
+    }
+    
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
@@ -131,6 +143,7 @@ export default function CadastrarProduto() {
         setPrice("");
         setStockQuantity("");
         setCategory("");
+        setShoeSize("");
         setImageFiles([]);
         if (fileInputRef.current) fileInputRef.current.value = "";
         setTimeout(() => setSuccessMsg(""), 1500);
@@ -251,9 +264,26 @@ export default function CadastrarProduto() {
                 <option value="masculino">Masculino</option>
                 <option value="feminino">Feminino</option>
                 <option value="infantil">Infantil</option>
-                <option value="acessório">Acessório</option>
+                <option value="acessorio">Acessório</option>
+                <option value="calcado">Calçados</option>
               </select>
             </div>
+            {category === "calcado" && (
+              <div>
+                <Label htmlFor="shoeSize">Numeração do Calçado*</Label>
+                <Input
+                  id="shoeSize"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={shoeSize}
+                  onChange={(e) => setShoeSize(e.target.value)}
+                  placeholder="Ex: 36, 36.5, 37..."
+                  required
+                  className="mt-1"
+                />
+              </div>
+            )}
             <div>
               <Label htmlFor="isFeatured">Destacar na página inicial</Label>
               <div className="mt-2 flex items-center gap-2">

@@ -80,7 +80,9 @@ const Home = async () => {
             transformedProducts
               .filter((product) => !product.isFeatured) // 🔥 remove os destaques
               .map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <div className="mt-6" key={product.id}>
+                  <ProductCard key={product.id} product={product} />
+                </div>
               ))
           ) : (
             <div className="col-span-full text-center text-gray-500">
