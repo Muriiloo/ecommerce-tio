@@ -33,7 +33,7 @@ const DropdownHeader = ({ icone }: DropdownHeaderProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{icone}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="z-[80] mr-10">
         {isAuthenticated ? (
           <>
             <DropdownMenuLabel>Olá, {user?.name}</DropdownMenuLabel>

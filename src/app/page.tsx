@@ -32,7 +32,7 @@ const Home = async () => {
             {images.map((image, idx) => (
               <CarouselItem key={idx}>
                 <Card className="border-0 rounded-none">
-                  <CardContent className="relative h-[500px] md:h-[600px] w-full p-0">
+                  <CardContent className="relative h-[500px] md:h-[790px] w-full p-0">
                     <Image
                       src={image.src}
                       alt={image.alt}
@@ -67,19 +67,21 @@ const Home = async () => {
 
       <section className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-semibold italic text-gray-900 mb-1">
+          <h2 className="text-3xl md:text-4xl font-semibold font-century uppercase text-gray-900 mb-1">
             Nossos Produtos
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto italic">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto font-century">
             Explore nossa seleção cuidadosamente curada dos melhores produtos
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-10">
           {transformedProducts.length ? (
-            transformedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
+            transformedProducts
+              .filter((product) => !product.isFeatured) // 🔥 remove os destaques
+              .map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
           ) : (
             <div className="col-span-full text-center text-gray-500">
               Nenhum produto encontrado.

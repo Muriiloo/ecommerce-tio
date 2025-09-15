@@ -121,23 +121,41 @@
   }
 }
 
-/* Customização das setas do Swiper Navigation */
-.swiper-button-prev,
-.swiper-button-next {
-  width: 36px !important;
-  height: 36px !important;
-  background-color: #9333ea !important; /* bg-purple-600 */
-  color: white !important;
-  border-radius: 9999px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-.swiper-button-prev::after,
-.swiper-button-next::after {
-  font-size: 16px !important;
-  font-weight: bold;
-  color: white !important;
+.animate-marquee {
+  display: inline-flex;
+  min-width: 200%;
+  animation: marquee 30s linear infinite;
 }
 
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 0;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+.link-underline:hover::after {
+  width: 100%;
+}
+
+.font-century {
+  font-family: 'Century Gothic', sans-serif;
+}

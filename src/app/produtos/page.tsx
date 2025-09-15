@@ -12,15 +12,17 @@ import {
   Heart,
 } from "lucide-react";
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 
 type Props = {
   searchParams: {
     category?: string;
+    featured?: string;
   };
 };
 
 const ProdutosPage = async ({ searchParams }: Props) => {
-  const { category } = await searchParams;
+  const { category, featured } = searchParams;
 
   const activeCategory = category?.toLowerCase() as
     | "feminino"
@@ -29,8 +31,27 @@ const ProdutosPage = async ({ searchParams }: Props) => {
     | "acessório"
     | undefined;
 
+  // aplica filtros
+  const whereClause: Prisma.ProductWhereInput = {};
+
+if (activeCategory) {
+  whereClause.category = activeCategory;
+}
+
+if (featured === "true") {
+  whereClause.isFeatured = true;
+}
+
+  if (activeCategory) {
+    whereClause.category = activeCategory;
+  }
+
+  if (featured === "true") {
+    whereClause.isFeatured = true;
+  }
+
   const products = await db.product.findMany({
-    where: activeCategory ? { category: activeCategory } : {},
+    where: whereClause,
   });
 
   const transformedProducts = transformProducts(products);
@@ -64,6 +85,7 @@ const ProdutosPage = async ({ searchParams }: Props) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-pink-50/30">
+      {/* Efeitos de background */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-purple-400/15 to-pink-600/15 rounded-full blur-3xl"></div>
         <div className="absolute top-1/3 -left-40 w-80 h-80 bg-gradient-to-br from-blue-400/15 to-indigo-600/15 rounded-full blur-3xl"></div>
@@ -71,6 +93,7 @@ const ProdutosPage = async ({ searchParams }: Props) => {
       </div>
 
       <div className="relative">
+        {/* Cabeçalho e busca */}
         <section className="container mx-auto px-6 py-20">
           <div className="text-center mb-16">
             <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-yellow-500 via-amber-700 to-orange-900 rounded-3xl mb-8 shadow-2xl">
@@ -99,6 +122,7 @@ const ProdutosPage = async ({ searchParams }: Props) => {
             </div>
           </div>
 
+          {/* Barra de busca e filtros */}
           <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20 mb-12">
             <div className="flex flex-col lg:flex-row gap-6 items-center">
               <div className="flex-1 relative">
@@ -150,6 +174,7 @@ const ProdutosPage = async ({ searchParams }: Props) => {
                 <p className="text-gray-600 text-sm">Exibir tudo</p>
               </div>
             </Link>
+
             {categories.map((category, index) => {
               const isActive = activeCategory === category.key;
 
@@ -196,7 +221,9 @@ const ProdutosPage = async ({ searchParams }: Props) => {
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-2">
-                  Produtos em Destaque
+                  {featured === "true"
+                    ? "Produtos em Destaque"
+                    : "Todos os Produtos"}
                 </h2>
                 <p className="text-gray-600">
                   {transformedProducts.length} produtos encontrados
@@ -223,6 +250,18 @@ const ProdutosPage = async ({ searchParams }: Props) => {
                   {transformedProducts.map((produto) => (
                     <ProductCard key={produto.id} product={produto} />
                   ))}
+                </div>
+              )}
+
+              {/* Botão para ver todos os produtos caso esteja filtrado por destaques */}
+              {featured === "true" && (
+                <div className="flex justify-center mt-10">
+                  <Link
+                    href="/produtos"
+                    className="px-6 py-3 bg-black text-white rounded-full font-century hover:bg-gray-800 transition"
+                  >
+                    Ver todos os produtos
+                  </Link>
                 </div>
               )}
             </div>

@@ -15,6 +15,7 @@ export type CartItem = {
   price: number;
   image?: string | null;
   quantity: number;
+  stockQuantity: number; // 🔹 Adicionado
   selectedSize?: string;
   selectedColor?: string;
 };
@@ -37,7 +38,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isMiniCartOpen, setMiniCartOpen] = useState(false);
 
-  // Persistência: Carrega do localStorage ao montar
+  // Carregar do localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
@@ -45,7 +46,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Persistência: Salva no localStorage quando mudar
+  // Salvar no localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
@@ -55,7 +56,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       prev.find((i) => i.id === item.id)
         ? prev.map((i) =>
             i.id === item.id
-              ? { ...i, quantity: i.quantity + item.quantity }
+              ? {
+                  ...i,
+                  quantity: Math.min(
+                    i.quantity + item.quantity,
+                    i.stockQuantity
+                  ), // 🔹 não ultrapassa estoque
+                }
               : i
           )
         : [...prev, item]
@@ -68,14 +75,24 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const increaseQty = (id: string) => {
     setCart((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i))
+      prev.map((i) =>
+        i.id === id
+          ? {
+              ...i,
+              quantity:
+                i.quantity < i.stockQuantity ? i.quantity + 1 : i.quantity, // 🔹 trava no limite
+            }
+          : i
+      )
     );
   };
 
   const decreaseQty = (id: string) => {
     setCart((prev) =>
       prev.map((i) =>
-        i.id === id && i.quantity > 1 ? { ...i, quantity: i.quantity - 1 } : i
+        i.id === id
+          ? { ...i, quantity: Math.max(1, i.quantity - 1) } 
+          : i
       )
     );
   };
