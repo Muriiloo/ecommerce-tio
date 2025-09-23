@@ -13,8 +13,7 @@ export const POST = async (request: Request) => {
     const description = formData.get("description")?.toString() || "";
     const details = formData.get("details")?.toString() || "";
     const price = Number(formData.get("price") || 0);
-    const stockQuantity = Number(formData.get("stockQuantity") || 0);
-    const shoeSize = formData.get("shoeSize") ? Number(formData.get("shoeSize")) : null;
+    const variantData = formData.get("variant") ? JSON.parse(formData.get("variant") as string) : null;
     const category = formData.get("category")?.toString() as
       | "masculino"
       | "feminino"
@@ -24,7 +23,7 @@ export const POST = async (request: Request) => {
 
     // Verificações básicas
     const files = formData.getAll("images") as File[];
-    if (!name || !price || !stockQuantity || files.length === 0) {
+    if (!name || !price || !variantData || files.length === 0) {
       return NextResponse.json(
         { success: false, error: "Campos obrigatórios ou imagens ausentes." },
         { status: 400 }
@@ -49,27 +48,28 @@ export const POST = async (request: Request) => {
     // A primeira imagem será a imagem principal
     const imageUrl = imageUrls[0];
     
-
     // Criação do produto no banco de dados
     const createdProduct = await db.product.create({
       data: {
         name,
         description,
         price,
-        stockQuantity,
         category,
         details,
-        imageUrl,
         isFeatured,
-        shoeSize,
-        images: {
-          create: imageUrls.map((url) => ({
-            imageUrl: url,
-          })),
+        variants: {
+          create: {
+            imageUrl: imageUrl,
+            size: variantData.size || null,
+            shoeSize: variantData.shoeSize || null,
+            color: variantData.color || null,
+            stockQuantity: variantData.stockQuantity,
+            priceAdjustment: 0,
+          }
         },
       },
       include: {
-        images: true,
+        variants: true,
       },
     });
 
@@ -89,7 +89,9 @@ export const POST = async (request: Request) => {
 export const GET = async () => {
   try {
     const products = await db.product.findMany({
-      include: { images: true },
+      include: { 
+        variants: true,
+      },
     });
     return NextResponse.json({ products });
   } catch (err) {

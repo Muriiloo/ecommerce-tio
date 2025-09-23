@@ -21,9 +21,18 @@ type Product = {
   description?: string;
   details?: string;
   price: number;
-  stockQuantity: number;
   isFeatured: boolean;
-  category: "masculino" | "feminino" | "infantil" | "acessório";
+  category: "masculino" | "feminino" | "infantil" | "acessorio" | "calcado";
+  variants: ProductVariant[];
+};
+
+type ProductVariant = {
+  id: string;
+  size?: string;
+  shoeSize?: number;
+  color?: string;
+  stockQuantity: number;
+  imageUrl: string;
 };
 
 export default function CadastrarProduto() {
@@ -43,6 +52,7 @@ export default function CadastrarProduto() {
   const [category, setCategory] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [shoeSize, setShoeSize] = useState("");
+  const [size, setSize] = useState("");
 
   useEffect(() => {
     async function validateUser() {
@@ -109,18 +119,43 @@ export default function CadastrarProduto() {
       return;
     }
 
+    if ((category === "masculino" || category === "feminino" || category === "infantil") && !size) {
+      setErrorMsg("Para roupas, é obrigatório informar o tamanho.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
     formData.append("details", details);
     formData.append("price", price);
-    formData.append("stockQuantity", stockQuantity);
     formData.append("category", category);
     formData.append("isFeatured", String(isFeatured));
     
-    // Adicionar shoeSize apenas se categoria for calçado
+    // Para calçados: criar variante com shoeSize
     if (category === "calcado" && shoeSize) {
-      formData.append("shoeSize", shoeSize);
+      formData.append("variant", JSON.stringify({
+        shoeSize: parseFloat(shoeSize),
+        stockQuantity: parseInt(stockQuantity),
+        imageUrl: "" // Será preenchida com a primeira imagem
+      }));
+    }
+    
+    // Para roupas: criar variante com size
+    if ((category === "masculino" || category === "feminino" || category === "infantil") && size) {
+      formData.append("variant", JSON.stringify({
+        size: size,
+        stockQuantity: parseInt(stockQuantity),
+        imageUrl: "" // Será preenchida com a primeira imagem
+      }));
+    }
+    
+    // Para acessórios: criar variante básica
+    if (category === "acessorio") {
+      formData.append("variant", JSON.stringify({
+        stockQuantity: parseInt(stockQuantity),
+        imageUrl: "" // Será preenchida com a primeira imagem
+      }));
     }
     
     imageFiles.forEach((file) => {
@@ -144,6 +179,7 @@ export default function CadastrarProduto() {
         setStockQuantity("");
         setCategory("");
         setShoeSize("");
+        setSize("");
         setImageFiles([]);
         if (fileInputRef.current) fileInputRef.current.value = "";
         setTimeout(() => setSuccessMsg(""), 1500);
@@ -284,6 +320,26 @@ export default function CadastrarProduto() {
                 />
               </div>
             )}
+            {(category === "masculino" || category === "feminino" || category === "infantil") && (
+              <div>
+                <Label htmlFor="size">Tamanho da Roupa*</Label>
+                <select
+                  id="size"
+                  value={size}
+                  onChange={(e) => setSize(e.target.value)}
+                  className="mt-1 block w-full border rounded-md p-2 text-gray-700"
+                  required
+                >
+                  <option value="">Selecione</option>
+                  <option value="PP">PP</option>
+                  <option value="P">P</option>
+                  <option value="M">M</option>
+                  <option value="G">G</option>
+                  <option value="GG">GG</option>
+                  <option value="XG">XG</option>
+                </select>
+              </div>
+            )}
             <div>
               <Label htmlFor="isFeatured">Destacar na página inicial</Label>
               <div className="mt-2 flex items-center gap-2">
@@ -351,6 +407,9 @@ export default function CadastrarProduto() {
                     Descrição
                   </TableHead>
                   <TableHead className="px-4 py-3 text-center text-sm font-semibold uppercase text-gray-700">
+                    Tam/Num
+                  </TableHead>
+                  <TableHead className="px-4 py-3 text-center text-sm font-semibold uppercase text-gray-700">
                     Destaque
                   </TableHead>
                   <TableHead className="px-4 py-3 text-right text-sm font-semibold uppercase text-gray-700">
@@ -368,7 +427,7 @@ export default function CadastrarProduto() {
                 {products.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={5}
+                      colSpan={7}
                       className="py-6 text-center text-gray-500"
                     >
                       Nenhum produto cadastrado.
@@ -387,6 +446,19 @@ export default function CadastrarProduto() {
                         {item.description || "-"}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-center text-gray-800">
+                        <div className="flex flex-wrap gap-1 justify-center">
+                          {item.variants.map((variant, index) => (
+                            <span 
+                              key={variant.id} 
+                              className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                            >
+                              {variant.shoeSize ? `${variant.shoeSize}` : variant.size || "Único"}
+                              <span className="text-gray-500 ml-1">({variant.stockQuantity})</span>
+                            </span>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell className="px-4 py-4 text-sm text-center text-gray-800">
                         <Button
                         variant={item.isFeatured ? "default" : "secondary"}
                         size="sm"
@@ -401,7 +473,7 @@ export default function CadastrarProduto() {
                         R$ {Number(item.price).toFixed(2)}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-800 text-right">
-                        {item.stockQuantity}
+                        {item.variants.reduce((total, variant) => total + variant.stockQuantity, 0)}
                       </TableCell>
                       <TableCell className="px-4 py-4 text-sm text-gray-800 text-center">
                         <Button
